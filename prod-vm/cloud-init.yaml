@@ -1,0 +1,17 @@
+#cloud-config
+# Born-hardened on first boot, so every rebuild is identical (no hand-tuning).
+# Adds chrony (time sync — matters for Kerberos/AD and certs) and auditd (audit log)
+# on top of the lab-vm hardening.
+package_update: true
+package_upgrade: true
+packages:
+  - vim-enhanced
+  - git
+  - chrony
+  - audit
+runcmd:
+  - [ bash, -c, "systemctl enable --now firewalld chronyd auditd" ]
+  - [ bash, -c, "firewall-cmd --permanent --add-service=ssh && firewall-cmd --reload" ]
+  - [ bash, -c, "printf 'PermitRootLogin no\nPasswordAuthentication no\nKbdInteractiveAuthentication no\n' > /etc/ssh/sshd_config.d/99-hardening.conf && systemctl restart sshd" ]
+  # SELinux is already Enforcing by default on AlmaLinux/Rocky/RHEL — leave it that way.
+final_message: "Prod-hardened VM ready (uptime $UPTIME s)."

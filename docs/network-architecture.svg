@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 800" font-family="ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#10b981"/>
+    </marker>
+    <marker id="arrT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5eead4"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="1060" height="800" fill="#16181c"/>
+  <rect x="0" y="0" width="1060" height="800" fill="none"/>
+
+  <!-- title -->
+  <text x="40" y="46" fill="#10b981" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="22" font-weight="600">ISSE Lab — Network Architecture</text>
+  <text x="40" y="70" fill="#aeb4bd" font-size="13">Azure hub VNet · private RFC&#160;1918 ranges · one public front door · deny-by-default everywhere</text>
+  <text x="1020" y="40" text-anchor="end" fill="#9fd6a6" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10" letter-spacing="2">UNCLASSIFIED // TRAINING</text>
+
+  <!-- internet -> front door chain -->
+  <rect x="555" y="92" width="150" height="42" rx="8" fill="#20242a" stroke="#343a42"/>
+  <text x="630" y="118" text-anchor="middle" fill="#eef1f4" font-size="14" font-weight="600">Internet</text>
+
+  <rect x="545" y="156" width="170" height="42" rx="8" fill="#1d2024" stroke="#2c3036"/>
+  <text x="630" y="178" text-anchor="middle" fill="#eef1f4" font-size="13" font-weight="600">Public IP (static)</text>
+  <text x="630" y="192" text-anchor="middle" fill="#6f7782" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10">reserve 1 · assigned by Azure</text>
+
+  <rect x="510" y="220" width="240" height="46" rx="8" fill="#13241d" stroke="#10362a"/>
+  <text x="630" y="242" text-anchor="middle" fill="#10b981" font-size="13" font-weight="600">App Gateway + WAF</text>
+  <text x="630" y="257" text-anchor="middle" fill="#cadfd6" font-size="10.5">front door — added later</text>
+
+  <line x1="630" y1="134" x2="630" y2="154" stroke="#10b981" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="630" y1="198" x2="630" y2="218" stroke="#10b981" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="630" y1="266" x2="630" y2="333" stroke="#10b981" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="640" y="300" fill="#cadfd6" font-size="10.5">HTTPS 443 →</text>
+
+  <!-- admin -->
+  <rect x="40" y="512" width="170" height="52" rx="8" fill="#20242a" stroke="#343a42"/>
+  <text x="125" y="536" text-anchor="middle" fill="#eef1f4" font-size="13" font-weight="600">Admin / Engineer</text>
+  <text x="125" y="552" text-anchor="middle" fill="#6f7782" font-size="10.5">no public RDP/SSH</text>
+  <line x1="210" y1="538" x2="248" y2="538" stroke="#5eead4" stroke-width="2" marker-end="url(#arrT)"/>
+
+  <!-- VNET container -->
+  <rect x="228" y="296" width="802" height="468" rx="14" fill="none" stroke="#10b981" stroke-width="1.5" stroke-dasharray="2 0" opacity="0.85"/>
+  <rect x="244" y="284" width="430" height="24" rx="6" fill="#16181c"/>
+  <text x="252" y="301" fill="#10b981" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12" font-weight="600">Azure VNet · vnet-lab-hub · 10.10.0.0/16</text>
+
+  <!-- ROW 1 -->
+  <!-- snet-identity -->
+  <rect x="250" y="333" width="240" height="150" rx="10" fill="#1d2024" stroke="#2c3036"/>
+  <text x="266" y="357" fill="#10b981" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="600">snet-identity</text>
+  <text x="266" y="373" fill="#6f7782" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">10.10.2.0/24</text>
+  <text x="266" y="402" fill="#5eead4" font-size="12.5">● AD DS Domain Controller</text>
+  <text x="266" y="422" fill="#eef1f4" font-size="12.5">● DNS (AD-integrated)</text>
+  <text x="266" y="442" fill="#aeb4bd" font-size="11.5">static IP 10.10.2.4</text>
+  <text x="266" y="468" fill="#6f7782" font-size="10.5">NSG: deny inbound by default</text>
+
+  <!-- snet-web -->
+  <rect x="510" y="333" width="240" height="150" rx="10" fill="#1d2024" stroke="#10362a"/>
+  <text x="526" y="357" fill="#10b981" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="600">snet-web</text>
+  <text x="526" y="373" fill="#6f7782" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">10.10.1.0/24</text>
+  <text x="526" y="402" fill="#5eead4" font-size="12.5">● Web Server (Rocky + NGINX)</text>
+  <text x="526" y="422" fill="#eef1f4" font-size="12.5">● TLS reverse proxy</text>
+  <text x="526" y="442" fill="#aeb4bd" font-size="11.5">static IP 10.10.1.4</text>
+  <text x="526" y="468" fill="#10b981" font-size="10.5">front-facing via App Gateway</text>
+
+  <!-- snet-mgmt -->
+  <rect x="770" y="333" width="240" height="150" rx="10" fill="#1d2024" stroke="#2c3036"/>
+  <text x="786" y="357" fill="#10b981" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="600">snet-mgmt</text>
+  <text x="786" y="373" fill="#6f7782" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">10.10.0.0/24</text>
+  <text x="786" y="402" fill="#5eead4" font-size="12.5">● MECM (Config Manager)</text>
+  <text x="786" y="422" fill="#eef1f4" font-size="12.5">● WSUS (Software Update Pt)</text>
+  <text x="786" y="442" fill="#eef1f4" font-size="12.5">● Jumpbox</text>
+  <text x="786" y="468" fill="#6f7782" font-size="10.5">NSG: deny inbound by default</text>
+
+  <!-- ROW 2 -->
+  <!-- AzureBastionSubnet -->
+  <rect x="250" y="508" width="240" height="150" rx="10" fill="#1d2024" stroke="#0a3a30"/>
+  <text x="266" y="532" fill="#5eead4" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="600">AzureBastionSubnet</text>
+  <text x="266" y="548" fill="#6f7782" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">10.10.255.0/26</text>
+  <text x="266" y="577" fill="#5eead4" font-size="12.5">● Azure Bastion</text>
+  <text x="266" y="597" fill="#aeb4bd" font-size="11.5">brokered RDP/SSH to all hosts</text>
+  <text x="266" y="640" fill="#6f7782" font-size="10.5">exact name + /26 required</text>
+
+  <!-- snet-security -->
+  <rect x="510" y="508" width="240" height="150" rx="10" fill="#1d2024" stroke="#2c3036"/>
+  <text x="526" y="532" fill="#10b981" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="600">snet-security</text>
+  <text x="526" y="548" fill="#6f7782" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">10.10.4.0/24</text>
+  <text x="526" y="577" fill="#5eead4" font-size="12.5">● Log Analytics / Sentinel</text>
+  <text x="526" y="597" fill="#eef1f4" font-size="12.5">● Wazuh manager (free SIEM)</text>
+  <text x="526" y="617" fill="#eef1f4" font-size="12.5">● Defender for Cloud</text>
+  <text x="526" y="643" fill="#6f7782" font-size="10.5">collects logs from everywhere</text>
+
+  <!-- snet-clients -->
+  <rect x="770" y="508" width="240" height="150" rx="10" fill="#1d2024" stroke="#2c3036"/>
+  <text x="786" y="532" fill="#10b981" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="13" font-weight="600">snet-clients</text>
+  <text x="786" y="548" fill="#6f7782" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">10.10.3.0/24</text>
+  <text x="786" y="577" fill="#5eead4" font-size="12.5">● Windows 11 endpoints</text>
+  <text x="786" y="597" fill="#eef1f4" font-size="12.5">● Defender / Wazuh agents</text>
+  <text x="786" y="617" fill="#eef1f4" font-size="12.5">● domain-joined</text>
+  <text x="786" y="643" fill="#6f7782" font-size="10.5">your simulated "real users"</text>
+
+  <!-- flows -->
+  <!-- updates: clients -> mgmt (vertical, col3) -->
+  <line x1="890" y1="508" x2="890" y2="485" stroke="#10b981" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+  <text x="900" y="500" fill="#cadfd6" font-size="10.5">updates ↑ (MECM/WSUS)</text>
+
+  <!-- legend -->
+  <rect x="40" y="690" width="600" height="74" rx="10" fill="#191c20" stroke="#23262b"/>
+  <text x="56" y="712" fill="#aeb4bd" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1">FLOW LEGEND</text>
+  <line x1="56" y1="730" x2="84" y2="730" stroke="#10b981" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="92" y="734" fill="#cadfd6" font-size="11.5">Inbound web traffic (Internet → WAF → web)</text>
+  <line x1="56" y1="750" x2="84" y2="750" stroke="#5eead4" stroke-width="2" marker-end="url(#arrT)"/>
+  <text x="92" y="754" fill="#b4e4d7" font-size="11.5">Admin access via Bastion (no public RDP/SSH)</text>
+  <text x="340" y="734" fill="#cadfd6" font-size="11.5">- - → Patch flow to MECM/WSUS</text>
+  <text x="340" y="754" fill="#aeb4bd" font-size="11.5">All hosts → Sentinel (logs) · → DC (auth/DNS)</text>
+</svg>

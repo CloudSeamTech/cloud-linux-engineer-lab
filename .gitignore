@@ -1,0 +1,50 @@
+# =============================================================
+# Keep secrets and machine-specific files OUT of git.
+# (.terraform.lock.hcl is intentionally NOT ignored — commit it
+#  so provider versions are pinned for everyone.)
+# =============================================================
+
+# --- Terraform ---
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# --- Real variable files (commit ONLY the .example) ---
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+
+# --- Secrets, keys, certs ---
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+id_rsa
+id_ed25519
+*_rsa
+*_ed25519
+kubeconfig
+*.kubeconfig
+azureauth.json
+*.publishsettings
+
+# --- OS / editor noise ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# --- Audio (regenerable from narration/ markdown; keeps repo light) ---
+audio/*.mp3
+!audio/.gitkeep

@@ -1,0 +1,1433 @@
+<!-- Cloud & Linux Engineer Lab — Mission Console -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cloud & Linux Engineer Lab — Mission Console</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg:#0f1217;
+    --panel:#171b21;
+    --panel-2:#13161b;
+    --line:#2a3039;
+    --line-soft:#20252c;
+    --ink:#f4f7fb;
+    --ink-dim:#c6cfd9;
+    --ink-faint:#5d6772;
+    --amber:#58a6ff;
+    --amber-soft:#16314d;
+    --teal:#56d4dd;
+    --teal-soft:#103840;
+    --red:#ff6b66;
+    --gold:#dbe2ea;
+    --gold-soft:#2b3442;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+    --sans:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.55;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,.035) 1px, transparent 0);
+    background-size:22px 22px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px 90px}
+
+  /* classification banner */
+  .classbar{
+    background:repeating-linear-gradient(45deg,#1a1f27,#1a1f27 12px,#15191f 12px,#15191f 24px);
+    color:#7d8aa0;border-bottom:1px solid #2a3039;
+    font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;
+    text-align:center;padding:7px 10px;
+  }
+
+  header.hero{padding:46px 0 26px;border-bottom:1px solid var(--line)}
+  .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--amber)}
+  h1{font-family:var(--mono);font-weight:600;font-size:clamp(26px,4.6vw,42px);margin:12px 0 6px;letter-spacing:-.01em;line-height:1.08}
+  h1 .dim{color:var(--ink-faint)}
+  .sub{color:var(--ink-dim);max-width:70ch;font-size:15px}
+
+  /* overall status panel */
+  .console{
+    margin-top:26px;display:grid;grid-template-columns:1.4fr 1fr;gap:14px;
+  }
+  @media(max-width:720px){.console{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+  .status{padding:20px 22px}
+  .status .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-faint)}
+  .pct{font-family:var(--mono);font-size:46px;font-weight:600;color:var(--amber);line-height:1;margin-top:8px}
+  .pct small{font-size:16px;color:var(--ink-faint)}
+  .meterline{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--ink-dim)}
+  .bar{height:8px;border-radius:6px;background:#101216;border:1px solid var(--line);overflow:hidden;margin-top:8px}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber),#7cc0ff);transition:width .5s cubic-bezier(.2,.8,.2,1)}
+
+  .ledger{padding:18px 20px}
+  .ledger .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px}
+  .ledger-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12.5px;padding:5px 0;border-bottom:1px dashed var(--line-soft);color:var(--ink-dim)}
+  .ledger-row:last-child{border-bottom:0}
+  .ledger-row b{color:var(--ink);font-weight:500}
+  .ledger-row .v{color:var(--teal)}
+
+  /* callouts */
+  .callout{margin-top:18px;border:1px solid var(--amber-soft);background:linear-gradient(180deg,#10202f,#0d1822);border-radius:10px;padding:16px 18px}
+  .callout h3{margin:0 0 6px;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber)}
+  .callout p{margin:6px 0 0;font-size:13.5px;color:#e0e8f2}
+  .callout.cost{border-color:var(--teal-soft);background:linear-gradient(180deg,#0f2329,#0c1a1e)}
+  .callout.cost h3{color:var(--teal)}
+  .callout.warn{border-color:#5a2326;background:linear-gradient(180deg,#221315,#1a1012)}
+  .callout.warn h3{color:var(--red)}
+  .callout.warn p{color:#e8c4c0}
+  .callout.cost p{color:#dbe9ec}
+  .callout code{font-family:var(--mono);font-size:12px;color:var(--amber)}
+  .costpanel{margin-top:18px;border:1px solid #3a2b2e;background:linear-gradient(180deg,#1a1417,#14161b);border-radius:10px;padding:16px 18px}
+  .costpanel h3{margin:0 0 4px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#ff8a86}
+  .costpanel .sub{color:var(--ink-dim);font-size:12.5px;margin:0 0 6px}
+  .costpanel .grp{margin-top:11px}
+  .costpanel .glbl{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+  .costpanel .free .glbl{color:#58a6ff}
+  .costpanel .kill .glbl{color:#ff6b66}
+  .costpanel .cheap .glbl{color:#56d4dd}
+  .costpanel ul{margin:0;padding-left:18px}
+  .costpanel li{font-size:13px;color:#dbe2ea;margin:3px 0;line-height:1.5}
+  .costpanel li b{color:#f4f7fb}
+  .costpanel code{font-family:var(--mono);font-size:12px;color:#58a6ff}
+  .costpanel .chk-list{margin-top:12px;border-top:1px solid var(--line-soft);padding-top:10px}
+  .costpanel .chk-list .glbl{color:#f4f7fb}
+
+  /* phase */
+  .phase{margin-top:34px}
+  .phase-head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px}
+  .phase-tag{font-family:var(--mono);font-size:12px;color:var(--bg);background:var(--amber);padding:3px 9px;border-radius:5px;font-weight:600;letter-spacing:.06em}
+  .phase-head h2{font-size:20px;margin:0;font-weight:600;letter-spacing:-.01em}
+  .phase-head .ph-sub{color:var(--ink-faint);font-size:13px;width:100%;margin-top:2px}
+  .phase-prog{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-dim);display:flex;align-items:center;gap:8px}
+  .phase-prog .pbar{width:90px;height:6px;border-radius:5px;background:#101216;border:1px solid var(--line);overflow:hidden}
+  .phase-prog .pbar > i{display:block;height:100%;width:0;background:var(--amber);transition:width .45s}
+
+  /* module */
+  .mod{border:1px solid var(--line);border-radius:9px;margin-top:12px;background:var(--panel-2);overflow:hidden;transition:border-color .2s;position:relative}
+  .mod::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(180deg,#e5484d 0 33%,#eef2f7 33% 66%,#58a6ff 66% 100%);z-index:1}
+  .mod.done{border-color:var(--gold-soft)}
+  .mod-top{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;cursor:pointer}
+  .mod-top:hover{background:#20242a}
+  .chk{flex:0 0 auto;margin-top:1px;width:22px;height:22px;border-radius:6px;border:1.5px solid var(--line);background:#101216;position:relative;transition:.18s}
+  .mod.done .chk{background:var(--gold);border-color:var(--gold)}
+  .chk:after{content:"";position:absolute;left:7px;top:3px;width:5px;height:10px;border:solid var(--bg);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) scale(0);transition:transform .18s}
+  .mod.done .chk:after{transform:rotate(45deg) scale(1)}
+  .mod-title{flex:1}
+  .mod-id{font-family:var(--mono);font-size:11px;color:var(--amber);letter-spacing:.1em}
+  .mod-name{font-weight:600;font-size:15.5px;margin-top:1px}
+  .mod.done .mod-name{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--ink-faint)}
+  .chev{flex:0 0 auto;color:var(--ink-faint);font-family:var(--mono);font-size:13px;margin-top:2px;transition:transform .2s}
+  .mod.open .chev{transform:rotate(90deg)}
+
+  .mod-body{display:none;padding:2px 18px 20px 52px;border-top:1px solid var(--line-soft)}
+  .mod.open .mod-body{display:block;animation:slot .25s ease}
+  @keyframes slot{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+  .seg{margin-top:16px}
+  .seg .seg-lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);display:flex;align-items:center;gap:8px}
+  .seg .seg-lbl:before{content:"";width:14px;height:1px;background:var(--line)}
+  .seg.why .seg-lbl{color:var(--amber)} .seg.why .seg-lbl:before{background:var(--amber-soft)}
+  .seg.il6 .seg-lbl{color:var(--teal)} .seg.il6 .seg-lbl:before{background:var(--teal-soft)}
+  .seg p{margin:7px 0 0;font-size:14px;color:var(--ink)}
+  .seg.why p{color:#e9eef5}
+  .seg.il6 p{color:#dbe9ec;font-size:13.5px}
+  .seg.rule{background:#141821;border:1px solid #2e3947;border-left:3px solid var(--gold);border-radius:7px;padding:10px 13px}
+  .seg.rule .seg-lbl{color:var(--gold)} .seg.rule .seg-lbl:before{background:var(--gold-soft)}
+  .seg.rule p{color:#e2e8f1;font-size:13.5px}
+  .viz{margin-top:16px;border:1px solid var(--line);border-radius:9px;background:#0c0f14;overflow:hidden}
+  .viz-frame{padding:14px}
+  .viz-frame svg{width:100%;height:auto;display:block}
+  .viz-cap{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--ink-faint);border-top:1px solid var(--line-soft);padding:8px 12px;background:#0a0d11}
+  ul.steps{margin:8px 0 0;padding-left:0;list-style:none}
+  ul.steps li{position:relative;padding:4px 0 4px 22px;font-size:13.6px;color:var(--ink)}
+  ul.steps li:before{content:"▸";position:absolute;left:2px;color:var(--amber);font-size:12px;top:5px}
+  ul.tshoot li:before{content:"⚠";color:var(--red)}
+  pre{background:#0e1013;border:1px solid var(--line);border-radius:7px;padding:12px 14px;margin:8px 0 0;overflow-x:auto;font-family:var(--mono);font-size:12.4px;color:#e7eef6;line-height:1.5}
+  pre .c{color:var(--ink-faint)}
+
+  /* controls */
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+  button.ctl{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;background:var(--panel);color:var(--ink-dim);border:1px solid var(--line);padding:9px 14px;border-radius:7px;cursor:pointer;transition:.18s}
+  button.ctl:hover{color:var(--ink);border-color:var(--ink-faint)}
+  button.ctl.danger:hover{color:var(--red);border-color:#6e2b2b}
+
+  /* tabs + prerequisites */
+  .tabbar{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-top:30px}
+  .tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--ink-faint);font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:12px 16px;cursor:pointer;transition:.18s}
+  .tab:hover{color:var(--ink-dim)}
+  .tab.active{color:var(--amber);border-bottom-color:var(--amber)}
+  .hidden{display:none}
+  .prereq-note{border:1px solid var(--teal-soft);background:linear-gradient(180deg,#0f2026,#0c171c);border-radius:10px;padding:18px 20px;margin:22px 0}
+  .prereq-note h3{margin:0 0 8px;font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
+  .prereq-note p{margin:10px 0 0;font-size:13.6px;color:#dde7ee;line-height:1.55}
+  .prereq-note b{color:#f1faf6}
+  .prereq-note ul{margin:10px 0 0;padding-left:0;list-style:none}
+  .prereq-note li{position:relative;padding:6px 0 6px 20px;font-size:13.4px;color:#dde7ee;line-height:1.5}
+  .prereq-note li:before{content:"\25B8";position:absolute;left:2px;color:var(--teal);top:6px}
+  .prereq-note code{font-family:var(--mono);font-size:12px;color:var(--amber)}
+  .pcard{border:1px solid var(--line);border-radius:9px;margin-top:10px;background:var(--panel-2);padding:14px 16px 14px 22px;display:flex;gap:14px;align-items:flex-start;cursor:pointer;transition:border-color .2s;position:relative;overflow:hidden}
+  .pcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(180deg,#e5484d 0 33%,#eef2f7 33% 66%,#58a6ff 66% 100%);z-index:1}
+  .pcard:hover{background:#20242a}
+  .pcard.done{border-color:var(--gold-soft)}
+  .pcard.done .chk{background:var(--gold);border-color:var(--gold)}
+  .pcard.done .chk:after{transform:rotate(45deg) scale(1)}
+  .pcard .pc-title{font-weight:600;font-size:15px}
+  .pcard.done .pc-title{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--ink-faint)}
+  .pcard .pc-desc{font-size:13.6px;color:var(--ink-dim);margin-top:3px;line-height:1.5}
+  .pcard pre{margin-top:10px}
+
+  footer{margin-top:48px;border-top:1px solid var(--line);padding-top:18px;color:var(--ink-faint);font-family:var(--mono);font-size:11px;letter-spacing:.06em}
+  .save-note{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:6px;height:14px;transition:.2s}
+  a{color:var(--teal)}
+</style>
+
+<div class="classbar">Unclassified // For Training Use Only — Simulated Environment</div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">Cloud & Linux Engineer Pathway · Azure Enterprise Lab</div>
+    <h1>Mission Console <span class="dim">// IL6-Style Build</span></h1>
+    <p class="sub">A check-off pathway for becoming a proficient Information Systems Security Engineer. Build a small enterprise environment in commercial Azure that mirrors how a classified (IL6) program is engineered, hardened, monitored, and authorized — then prove you can rebuild it from code.</p>
+
+    <div class="console">
+      <div class="card status">
+        <div class="lbl">Overall Completion</div>
+        <div class="pct"><span id="pctNum">0</span><small>%</small></div>
+        <div class="bar"><i id="overBar"></i></div>
+        <div class="meterline"><span id="modCount">0 / 0 modules</span><span id="phaseCount">0 / 8 phases</span></div>
+        <div class="save-note" id="saveNote"></div>
+      </div>
+      <div class="card ledger">
+        <div class="lbl">Phase Ledger</div>
+        <div id="ledger"></div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <h3>Reality check — read this first</h3>
+      <p>You cannot legally or technically stand up a real IL6 system at home. True IL6 (classified up to SECRET) runs <b>only</b> in Azure Government Secret: a SIPRNet (Secret Internet Protocol Router Network)-connected, ICD (Intelligence Community Directive) 705-accredited, cleared-US-citizen-operated dedicated cloud. This lab uses ordinary commercial Azure to teach the <b>transferable engineering and the control framework</b> (RMF (Risk Management Framework) · NIST (National Institute of Standards and Technology) 800-53 · DISA STIGs (Security Technical Implementation Guides) · DoD (Department of Defense) SRG IL5 (Impact Level 5) baseline + ~94-control classified overlay). Master this and you walk into the accredited environment already fluent.</p>
+    </div>
+
+    <div class="callout cost">
+      <h3>Keep it cheap — the prime directive</h3>
+      <p>Cost is driven by running VMs (Virtual Machines) and disks. Set a budget + alert in Phase 0, use <b>B-series burstable</b> VMs, enable <b>auto-shutdown</b>, and <b>deallocate (stop) every VM</b> when you log off. Fully deallocated, this lab costs near $0/month; left running carelessly it can hit $100+. Intune needs a license — use a free EMS E5 / M365 trial. Treat "<i>terraform destroy</i> at end of session" as a habit, not an afterthought.</p>
+    </div>
+
+    <div class="costpanel">
+      <h3>Cost control &mdash; staying under $100/month</h3>
+      <p class="sub">Glance at this before every session. The lab is build &rarr; prove &rarr; screenshot &rarr; tear down &mdash; not leave-it-running. The only way to overshoot $100 is forgetting to delete the firewall/AKS or leaving a VM on.</p>
+
+      <div class="grp free">
+        <div class="glbl">Free or pennies &mdash; build all you want</div>
+        <ul>
+          <li><b>VNets, subnets, NSGs, route tables (UDRs), peering</b> &mdash; free.</li>
+          <li><b>Azure Bastion Developer SKU</b> &mdash; free; use it for single-VNet labs instead of Basic.</li>
+          <li><b>Key Vault, Storage</b> &mdash; pennies. <b>AKS control plane</b> (Free tier) &mdash; $0; you only pay for the node VM.</li>
+          <li><b>Entra ID, Azure Policy, Defender CSPM</b> &mdash; free tiers. New accounts get a <b>$200 credit for 30 days</b>.</li>
+        </ul>
+      </div>
+
+      <div class="grp kill">
+        <div class="glbl">Budget-killers &mdash; deploy, prove, then DESTROY the same day</div>
+        <ul>
+          <li><b>Azure Firewall</b> &mdash; ~$1.25/hr Standard (~$900/mo if left on), ~$0.40/hr Basic (~$335/mo), plus ~$100/mo per policy. Run it an hour for the hub-and-spoke lab, then kill it.</li>
+          <li><b>AKS worker nodes</b>, a <b>large always-on VM</b>, <b>Bastion Basic</b> (~$140/mo), and <b>VPN / NAT Gateway</b> &mdash; same rule.</li>
+        </ul>
+      </div>
+
+      <div class="grp cheap">
+        <div class="glbl">Cheap with discipline</div>
+        <ul>
+          <li><b>Small B-series VM</b> &mdash; B1s ~$8/mo, B2s ~$30/mo if left on 24/7. <b>Deallocate (stop) it</b> when idle and you pay only a few dollars for the disk.</li>
+        </ul>
+      </div>
+
+      <div class="chk-list">
+        <div class="glbl">End-of-session teardown checklist</div>
+        <ul>
+          <li><code>terraform destroy</code> &mdash; or delete the whole resource group (everything inside goes with it).</li>
+          <li>Deallocate any VM you are keeping; confirm <b>Firewall, AKS, and Bastion Basic are gone</b>.</li>
+          <li>Check <b>Cost Management &rarr; Cost analysis</b>; keep your Phase 0 budget alert at ~$50 and ~$90.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <h3>How you'll work</h3>
+      <p>Visual Studio Code is your workbench — that's where the heavy lifting happens. You write the Terraform, Ansible, and scripts there, run <code>az</code>, <code>terraform</code>, <code>git</code>, and <code>kubectl</code> from its built-in terminal, and use Remote-SSH (Secure Shell) to edit straight on your Linux VMs. The Azure portal is for <em>viewing and verifying</em>, not building. The loop is: edit code &rarr; run it in the terminal &rarr; commit to git &rarr; apply.</p>
+    </div>
+
+    <div class="callout">
+      <h3>Your reusable lab VM (Infrastructure as Code)</h3>
+      <p>The repo ships a ready-to-run <code>lab-vm/</code> folder (Terraform + cloud-init + a Makefile) that builds your <b>exact</b> hardened AlmaLinux VM from code. <b>One-time:</b> <code>az login</code>, install Terraform + Azure CLI, run <code>ssh-keygen</code>, set <code>allow_ssh_cidr</code> to your own IP, and accept the free image EULA: <code>az vm image terms accept --publisher almalinux --offer almalinux-x86_64 --plan 9-gen2</code>. <b>Then the loop is:</b> <code>make up</code> (build) &rarr; <code>make ssh</code> (log in) &rarr; <code>make stop</code> (deallocate &mdash; keeps your data, ~$0 compute) or <code>make down</code> (destroy; rebuild later with <code>make up</code>). The hardening lives in <code>cloud-init.yaml</code>, so every rebuild is identical &mdash; never hand-tune. The full rep loop and the deallocate-vs-destroy explainer are in <code>lab-vm/README.md</code>.</p>
+    </div>
+
+    <div class="callout">
+      <h3>Runbook: zero &rarr; AlmaLinux VM &rarr; internal HTTPS site</h3>
+      <p>This is the real remote-engineer setup: you run the commands <b>from your own laptop</b> (VS Code's terminal), while <b>all the infrastructure lives in Azure</b>. The <code>lab-vm/</code> and <code>nginx-tls/</code> folders are in <b>your GitHub repo</b> &mdash; clone it and <code>cd</code> into the folder. <b>Stage 1</b> builds the machine in Azure; <b>Stage 2</b> builds the site on it. (Want zero local installs instead? Run Stage 1 in Azure Cloud Shell &mdash; see the note under the commands.)</p>
+      <pre><span class="c"># --- Stage 1: from your laptop (VS Code terminal) --- build the VM IN Azure</span>
+az login                               <span class="c"># sign in to your Azure subscription</span>
+git clone &lt;your-repo&gt; &amp;&amp; cd lab-vm    <span class="c"># the lab-vm folder is INSIDE your repo</span>
+curl ifconfig.me                       <span class="c"># your home IP -&gt; set allow_ssh_cidr in terraform.tfvars</span>
+make up            <span class="c"># Terraform builds a fresh hardened AlmaLinux VM in Azure</span>
+make ssh           <span class="c"># SSH from your laptop into the Azure VM</span>
+
+<span class="c"># --- Stage 2: on the VM --- build the internal HTTPS site</span>
+sudo dnf install -y podman openssl
+git clone &lt;your-repo&gt; &amp;&amp; cd nginx-tls    <span class="c"># same repo, the nginx-tls folder</span>
+chmod +x *.sh
+./make-internal-ca.sh                        <span class="c"># your internal CA (private PKI)</span>
+sudo cp ca/ca.crt /etc/pki/ca-trust/source/anchors/lab-ca.crt &amp;&amp; sudo update-ca-trust
+./issue-cert.sh                              <span class="c"># generate CSR -&gt; CA signs -&gt; install cert</span>
+./run-nginx.sh                               <span class="c"># NGINX-in-a-container serves HTTPS</span>
+echo '127.0.0.1 internal.lab' | sudo tee -a /etc/hosts
+curl -v https://internal.lab:8443           <span class="c"># verify: trusted, TLS 1.2+</span>
+
+<span class="c"># renew anytime by re-running ./issue-cert.sh   |   tear down with: make down</span></pre>
+      <p><b>Where things live:</b> only the CLI tools (<code>az</code>, <code>terraform</code>, <code>git</code>, <code>ssh</code>) and your repo clone sit on your laptop &mdash; every VM, network, and container is in Azure. That is exactly how a remote cloud engineer works from home: laptop drives, cloud hosts. Lock <code>allow_ssh_cidr</code> to your home IP so only you can reach the VM. <b>No local installs wanted?</b> Run Stage 1 from <b>Azure Cloud Shell</b> (browser, with <code>az</code>/<code>terraform</code>/<code>git</code> preinstalled) instead &mdash; just note its IP changes per session, so reset <code>allow_ssh_cidr</code> each time (or use Azure Bastion).</p>
+    </div>
+
+    <div class="callout">
+      <h3>Job-description decoder: Zero Trust, DevSecOps &amp; FISMA — you already built these</h3>
+      <p>Cleared cyber-engineer postings (Peraton, GDIT, Booz, etc.) use framework vocabulary for things this lab does hands-on. Learn the mapping so you can claim your own work in their language:</p>
+      <p><b>Zero Trust Architecture (ZTA)</b> &mdash; "never trust by network location; verify every request." You implemented its pillars: <b>identity as the perimeter</b> (MFA + Conditional Access + PIM &mdash; 7.1, 7.6), <b>least privilege</b> (RBAC scopes &mdash; 0.4, 7.1), <b>micro-segmentation</b> (NSGs, private endpoints, no public IPs, Bastion-only admin &mdash; 2.2, 2.3, 2.6), <b>assume breach</b> (centralized logging, detection, automated response &mdash; 6.2, 10.3), and <b>verified devices</b> (Intune compliance &mdash; 5.3). Interview line: <i>"My lab is Zero Trust end to end &mdash; no admin port faces the internet, every request is verified by identity and device, and I assume breach with Sentinel watching."</i></p>
+      <p><b>DevSecOps</b> &mdash; security checks <em>embedded in</em> the pipeline instead of bolted on at the end. Your 1.7 IaC scanner running automatically inside your 7.8 gated pipeline (with OIDC, no stored secrets) <b>is</b> DevSecOps &mdash; the "shift left" pattern by name. Interview line: <i>"Every commit is scanned and planned before a human approves the apply &mdash; security is a pipeline stage, not an afterthought."</i></p>
+      <p><b>FISMA High / NIST 800-53 high-impact</b> &mdash; FISMA is the federal law requiring the RMF process you learned in 0.1; "High" is the strictest control baseline (more controls, stricter parameters) for systems whose compromise would be catastrophic &mdash; satellite ground systems, for example. Your scan-remediate-document-evidence loop (3.4, 4.2, 6.4, 8.2&ndash;8.3) is exactly that work at lab scale.</p>
+      <p><b>Translation table:</b> "SOPs" = your runbooks (7.4) &middot; "attack reconstruction / forensics" = your Sentinel investigation graph + KQL timelines (10.3) &middot; "vulnerability remediation solutions" = your scan&rarr;prioritize&rarr;patch&rarr;verify loop (5.4, 5.6, 6.3) &middot; "secure network connectivity monitoring" = Network Watcher + flow logs (2.5, 10.3) &middot; "configuration guides &amp; architecture diagrams" = your 8.4 diagram with control mapping.</p>
+    </div>
+
+    <div class="controls">
+      <button class="ctl" id="expandAll">Expand all</button>
+      <button class="ctl" id="collapseAll">Collapse all</button>
+      <button class="ctl danger" id="resetAll">Reset progress</button>
+    </div>
+  </header>
+
+  <div class="tabbar">
+    <button class="tab" id="tab-prereq">&#9312; Prerequisites &amp; Setup</button>
+    <button class="tab" id="tab-course">&#9313; Course Pathway</button>
+  </div>
+
+  <section id="prereq-view" class="view">
+    <div class="prereq-note">
+      <h3>Is this how real enterprises actually work?</h3>
+      <p><b>Mostly yes &mdash; and that's the point.</b> The core of what you do here is exactly what enterprise and government teams do every day: define infrastructure and config as code, work from an editor like VS Code with a terminal, drive everything through CLIs (<code>az</code>, <code>terraform</code>, <code>git</code>, <code>kubectl</code>), keep it all in version control, and ship changes through reviewed pipelines. Those muscles transfer directly.</p>
+      <p><b>What's different at enterprise / classified scale is the guardrails around that style &mdash; not the style itself:</b></p>
+      <ul>
+        <li><b>Your workstation is managed.</b> You won't freely install whatever you want &mdash; software comes from an approved catalog (pushed via Intune/MECM (Microsoft Endpoint Configuration Manager)) and admin rights are restricted. In classified work you're on government-furnished equipment inside an accredited facility, often a VDI (Virtual Desktop Infrastructure)/thin client with no internet.</li>
+        <li><b>Version control is internal, not public GitHub</b> &mdash; GitHub Enterprise, GitLab, Azure DevOps, or an air-gapped internal server.</li>
+        <li><b>No open internet for packages</b> &mdash; tools and updates come from internal mirrors (Artifactory/Nexus, internal repos), not the public registries.</li>
+        <li><b>You don't hold standing admin.</b> Privileged access is just-in-time (PIM (Privileged Identity Management)), often from a dedicated privileged-access workstation, and credentials come from a vault (Delinea) &mdash; you rarely type a password.</li>
+        <li><b>You usually don't deploy to production from your laptop.</b> A pipeline runs <code>terraform apply</code> with an approver and separation of duties; your job is the code and the pull request.</li>
+        <li><b>The cloud is GovCloud / Azure Government</b> (and at IL6, the classified Secret cloud) &mdash; same tools, different endpoints and controls.</li>
+      </ul>
+      <p>Nothing you learn here is wasted &mdash; it's the same workflow with more controls layered on. Building it the open way first is how you get fluent enough to thrive once those controls are in place.</p>
+    </div>
+
+    <div class="phase-head">
+      <span class="phase-tag" style="background:var(--teal);color:var(--bg)">SETUP</span>
+      <h2>Prerequisites &mdash; get your workstation ready</h2>
+      <div class="phase-prog"><span id="preCount">0/9</span><div class="pbar"><i id="preBar"></i></div></div>
+    </div>
+    <div id="prereq-list"></div>
+  </section>
+
+  <section id="seq-guide" class="prereq-note">
+    <h3>How to work through this — in order</h3>
+    <p>These phases are built to be done <b>top to bottom</b>, and each one assumes the last is finished. Starting from a brand-new Azure account: do the <b>Prerequisites</b> tab first, then walk the phases in this order — it respects what depends on what.</p>
+    <ul>
+      <li><b>Prerequisites</b> → install your tools + set a budget alert (free)</li>
+      <li><b>Phase 0 · Foundations</b> → learn the landscape and cost guardrails; no resources yet (free)</li>
+      <li><b>Phase 1 · Infrastructure as Code</b> → learn Terraform; build &amp; destroy a resource group (≈ $0)</li>
+      <li><b>Phase 2 · Networking</b> → the private network spine</li>
+      <li><b>Phase 3 · Active Directory</b> → the identity backbone (everything starts with identity)</li>
+      <li><b>Phase 4 · Linux</b> → your first server (the web tier)</li>
+      <li><b>Phase 5 · Patching</b> → keep everything updated</li>
+      <li><b>Phase 6 · Security tooling</b> → the eyes and ears: logging, scanning, secrets</li>
+      <li><b>Phase 7 · Operations</b> → access (RBAC (Role-Based Access Control)/PIM/MFA (Multi-Factor Authentication)), storage, CI/CD (Continuous Integration / Continuous Delivery), cost</li>
+      <li><b>Phase 10 · Resilience &amp; Response</b> → backup/DR + incident response — do this alongside the capstone</li>
+      <li><b>Phase 8 · Capstone</b> → build it all from one repo, assess it, document it, then destroy &amp; rebuild</li>
+      <li><b>Phase 9 · Market Add-ons</b> → Kubernetes, AWS, certs — save for last, to broaden</li>
+    </ul>
+    <p>A few validation steps borrow a resource from a later phase — e.g., the Azure Firewall test in 2.7 uses the Linux VM you build in Phase 4. That's expected; just loop back and validate once that VM exists.</p>
+    <p><b>Golden cost rule:</b> run only the VMs the current phase needs, <b>deallocate every night</b>, and <b>delete the pricey extras</b> (Azure Bastion, Azure Firewall, Application Gateway, AKS (Azure Kubernetes Service)) the moment you finish validating them. Fully torn down, the lab costs about $0 — left running, it does not. The Phase 0 budget alert is your safety net.</p>
+    <h3>Engineer's daily habits (rules of thumb worth memorizing)</h3>
+    <p><b>Start of every session</b> — confirm your footing before you build: <code>az account show</code> (right subscription?), <code>terraform version</code>, <code>git status</code>, then <code>git pull --rebase</code>. Two minutes here prevents most wrong-place / stale-login / merge-mess mistakes.</p>
+    <p><b>Terraform</b> — always <code>fmt</code> &rarr; <code>validate</code> &rarr; <code>plan</code>, and read the plan like a receipt before <code>apply</code>. Never make manual portal changes to anything Terraform manages, or it will drift.</p>
+    <p><b>Git / GitHub</b> — <code>git pull --rebase</code> before you push so history stays clean; commit small and often with clear messages; never commit secrets (if you do, rotate them — deleting the commit is not enough).</p>
+    <p><b>Security</b> — default deny and open only what you can name; least privilege at the smallest scope; make admin rights temporary (PIM); secrets live in Key Vault, never in code.</p>
+    <p><b>Cost</b> — deallocate VMs every night and delete the pricey extras (Bastion, Azure Firewall, AKS) the moment you finish validating. Idle resources still bill.</p>
+    <p><b>Troubleshooting</b> — read logs first, guess second (<code>systemctl status</code> then <code>journalctl -u</code>); work the path in order (NSG &rarr; route &rarr; DNS &rarr; host). Narrate your steps — it is exactly how to think out loud in an interview.</p>
+  </section>
+
+  <main id="phases"></main>
+
+  <footer>
+    CLOUD & LINUX ENGINEER LAB v1 · progress saved to this artifact · not affiliated with DoD/DISA · training scaffold only
+  </footer>
+</div>
+
+<script>
+/* ----------------------------- CURRICULUM DATA ----------------------------- */
+const PHASES = [
+{
+  tag:"P0", title:"Foundations & Guardrails",
+  sub:"Understand what an ISSE (Information Systems Security Engineer) actually does, then make your Azure tenant safe and cheap before you build anything.",
+  mods:[
+    { id:"0.1", rule:"Learn to speak in control language. In a real shop every change ties back to a control or a ticket; saying 'this satisfies AC-17' or 'this closes the POA&M' is how you earn trust with the security team.", name:"Learn the role and the frameworks",
+      why:"An ISSE (Information Systems Security Engineer) is the engineer who builds and configures systems so they can survive a security audit and earn permission to operate. Before touching Azure, you need the vocabulary of the people who decide that: RMF, the control catalog, and the audit tooling.",
+      steps:[
+        {t:"Read the 6-step Risk Management Framework (RMF): Categorize, Select, Implement, Assess, Authorize, Monitor — this is the lifecycle every gov system lives in."},
+        {t:"Skim NIST (National Institute of Standards and Technology) SP 800-53 control families (AC (Access Control), AU (Audit and Accountability), CM (Configuration Management), IA (Identification and Authentication), SC (System and Communications Protection), SI...). You don't memorize them; you learn to map technical settings to control IDs."},
+        {t:"Understand the artifacts you'll produce: SSP (System Security Plan), POA&M (Plan of Action & Milestones), ATO (Authorization to Operate), and eMASS (where packages live)."},
+        {t:"Learn what a DISA STIG (Security Technical Implementation Guide) is: a checklist of required hardening settings for a specific product (Windows, RHEL, NGINX, etc.)."}
+      ],
+      tshoot:["If frameworks feel abstract, anchor each one to a question: RMF = 'what's the process?', 800-53 = 'what must be true?', STIG = 'exactly how do I set it?'."],
+      il6:"FISMA is the federal law mandating this whole RMF process; a 'FISMA High' system (the phrase in many job postings) uses the strictest 800-53 baseline — more controls, tighter parameters. IL6 (Impact Level 6) = a FedRAMP (Federal Risk and Authorization Management Program) High baseline + DoD (Department of Defense) SRG FedRAMP+ enhancements + a CNSSI (Committee on National Security Systems Instruction) 1253 classified overlay (~94 extra controls on top of IL5 (Impact Level 5)). Everything you build maps back to these." },
+    { id:"0.2", rule:"Set a budget alert before you build anything. Day one, every cloud account should have a spending cap and an email alert — surprise bills are how junior engineers get noticed for the wrong reason.", name:"Create the subscription and lock down cost",
+      why:"The single fastest way to ruin a home lab is a surprise bill. You set financial guardrails on day one so experimentation never becomes expensive.",
+      steps:[
+        {t:"Create a Pay-As-You-Go subscription (or use Azure free credit). Note: a real ISSE (Information Systems Security Engineer) works in Azure Government — the portal is different but the skills are identical."},
+        {t:"Create a Budget under Cost Management with an alert at 50/80/100% of a small monthly cap (e.g. $40)."},
+        {t:"Set an auto-shutdown policy mindset now: every VM you create later gets a daily auto-shutdown."},
+        {code:"# verify your context before you spend a cent\naz login\naz account show --output table\naz account set --subscription \"<your-sub-id>\""}
+      ],
+      tshoot:["Bill creeping up with nothing 'running'? Deallocated VMs (Virtual Machines) are free for compute but you STILL pay for their disks, public IPs, and bastion. Delete what you're not using."],
+      il6:"Maps to control family planning discipline — gov programs live and die by resource accountability and least-cost-to-mission." },
+    { id:"0.3", rule:"Start every session by confirming your footing: run az account show (right subscription?), terraform version, git status, and git pull --rebase before you touch anything. Two minutes here saves an hour of chasing a stale-login or wrong-subscription mistake.", name:"Make VS Code your command center (install + verify the toolchain)",
+      why:"Almost all the real work — writing Terraform, Ansible, and scripts, editing config, and running the CLI (Command-Line Interface) — happens in one place: Visual Studio Code. The Azure portal is for viewing and verifying, not building. Setting VS Code up as your workbench now is what makes everything after this fast.",
+      steps:[
+        {t:"Install VS Code, then add the key extensions: HashiCorp Terraform, Azure CLI Tools / Azure Account, Remote - SSH (to edit directly on your Linux VMs (Virtual Machines)), YAML, and GitLens."},
+        {t:"Install the underlying tools — Azure CLI, Terraform, Git — and do everything from VS Code's integrated terminal (Ctrl+`): code and commands side by side, then Remote-SSH into a VM to edit its files as if they were local."},
+        {code:"# confirm everything is present\naz version\nterraform -version\ngit --version\nssh-keygen -t ed25519 -C \"isse-lab\"   # creates your key"}
+      ],
+      tshoot:["'command not found' after install → PATH issue; reopen the VS Code terminal or restart VS Code so it picks up the new PATH.","Terraform extension not formatting/validating → confirm the HashiCorp Terraform extension is enabled and terraform is on PATH.","Remote-SSH won't connect → check the NSG (Network Security Group) allows SSH from your jumpbox/Bastion and you're using the right key."],
+      il6:"A single, scripted, version-controlled workbench — code, terminal, and git in one window — is the foundation of CM (Configuration Management): portal clicks can't be audited, committed code can." },
+    { id:"0.4", rule:"Always confirm which subscription and resource group you are pointed at before running a command. az account show is the cloud version of looking before you leap — most 'why did that deploy there?' incidents start here.", name:"Map the Azure hierarchy (tenant → RG → resource)",
+      why:"You can't secure what you can't picture. Azure nests: a Tenant holds Subscriptions, which hold Resource Groups, which hold the actual resources. RBAC (who can do what) is granted at each level.",
+      steps:[
+        {t:"Draw the hierarchy on paper. Place 'identity' (Entra ID) at the top — it's the new perimeter."},
+        {t:"Create your first resource group by hand once, just to feel it, then never again — Terraform owns it after this."},
+        {code:"az group create --name rg-lab-core --location eastus\naz group list --output table"}
+      ],
+      tshoot:["Region picked badly = higher latency/cost. Pick one region and stay in it for the whole lab."],
+      il6:"Entra ID + RBAC scoping is the technical heart of the AC (Access Control) and IA (Identification & Authentication) families." },
+    { id:"0.5", rule:"Never lift-and-shift blindly. Real migrations start with an inventory and a decision per app (rehost, replatform, retire). Walking in with 'here are the options and why' is what separates an engineer from an order-taker.", name:"Landing zones & on-prem-to-cloud migration (the process)",
+      why:"Before an organization moves anything to the cloud, it builds a landing zone — a pre-secured, governed foundation — then migrates workloads into it in waves. Knowing this process is how you speak credibly about real enterprise cloud work, even though your lab itself is one small environment.",
+      steps:[
+        {t:"A landing zone is the 'neighborhood' you build before moving in: management groups, subscriptions, hub networking, identity (Entra), policy guardrails, central logging, and security baselines — all as code — so every workload lands somewhere already compliant. Microsoft's Cloud Adoption Framework calls this the 'Ready' phase."},
+        {t:"Migration follows a repeatable arc: Plan → Ready (build the landing zone) → Migrate (Assess → Migrate → Optimize → Secure & Manage), done in small waves, never big-bang."},
+        {t:"Pick a strategy per workload — the '6 R's': Rehost (lift-and-shift a VM (Virtual Machine) as-is), Replatform (small tweaks, e.g. a managed database), Refactor (rebuild cloud-native), Repurchase (move to a SaaS product), Retire (decommission), Retain (leave on-prem for now)."},
+        {t:"Tools: Azure Migrate (discover, assess, and move servers), Azure Database Migration Service (databases), and Azure Data Box (ship a physical appliance when there is too much data to push over the wire); AzCopy or rsync for files."},
+        {t:"Cut over safely: migrate into a test landing zone first, validate, then cut over with a rollback plan — never delete the source until the target is proven."}
+      ],
+      tshoot:["Trying to migrate everything at once → high risk; do it in small waves with validation and a rollback path between each.","Too much data for the network link → use Azure Data Box (offline shipping) instead of saturating the connection for weeks."],
+      il6:"Landing zones bake controls in BEFORE workloads arrive (CM (Configuration Management)/AC (Access Control)/SC (System and Communications Protection) families), so every workload inherits a compliant baseline — that is the foundation an ATO (Authorization to Operate) is built on." },
+    { id:"0.6", rule:"Know where your responsibility ends. The shared-responsibility line is the first thing auditors and architects ask about; being able to say 'the provider owns X, we own Y' instantly marks you as someone who gets cloud.", name:"IaaS vs SaaS — two authorization boundaries for one org",
+      why:"One organization usually runs more than one kind of cloud system at once — for example an IaaS system (VMs (Virtual Machines) it manages, like this lab) and a SaaS system (a finished app such as Microsoft 365 or ServiceNow). Each is its OWN authorization boundary with its own responsibilities, and confusing the two is a classic mistake.",
+      steps:[
+        {t:"Shared responsibility differs by model. IaaS: you own the OS (Operating System), patching, hardening, apps, and data — your lab is IaaS. SaaS: the vendor owns the app and infrastructure; you own only your data, your configuration, and identity/access."},
+        {t:"So one org draws TWO boundaries: an IaaS boundary (everything you run and are accountable for — VMs, network, OS) and a separate SaaS boundary (a system that leans on the vendor's authorization). Each gets its own System Security Plan and its own ATO (Authorization to Operate)."},
+        {t:"Control inheritance is the real difference. The SaaS boundary inherits most technical controls from the provider — in government the SaaS must be FedRAMP (Federal Risk and Authorization Management Program)-authorized at the right level — so your job there is data, identity (SSO (Single Sign-On)/Conditional Access), and configuration. The IaaS boundary you implement far more controls yourself."},
+        {t:"Draw both boundaries explicitly on the architecture diagram: what is inside each, which controls are inherited, and where they connect (usually through identity/SSO)."}
+      ],
+      tshoot:["Assuming a SaaS app is 'secure because it's SaaS' → you still own its data, access, and configuration; the vendor's authorization does not cover your misconfiguration.","Blurring the two boundaries → controls get double-counted or missed entirely; keep separate SSPs and a clear line between them."],
+      il6:"Authorization boundaries and control inheritance are core RMF (Risk Management Framework); at IL5 (Impact Level 5)/6 a SaaS must hold the right FedRAMP/DoD (Department of Defense) authorization, and your boundary covers only what you actually control — data, identity, and configuration." },
+    {"id": "0.7", "name": "What DevOps really is — culture, flow, and business value", "rule": "Interviewers test culture before tools. If you can explain why DevOps exists — faster, safer delivery by bridging Dev and Ops — before you name a single tool, you stand out from the tool-list crowd.", "why": "DevOps is not a toolbox; it is a way of working that closes the gap between the people who build software (Dev) and the people who run it (Ops). The goal is flow: ship small changes often, get fast feedback, and automate the path so releases become routine instead of risky. Businesses adopt it because it turns delivery from a quarterly fire-drill into a daily, reversible habit — which is what every Cloud and DevOps job description is really buying.", "steps": [{"t": "Read the DevOps overview at roadmap.sh/devops to see how the whole ecosystem fits together before you go deep on any one tool."}, {"t": "In your own words, explain the Dev-and-Ops bridge: why throwing code over the wall to a separate ops team causes outages, and how shared ownership fixes it."}, {"t": "Name the three pillars plainly: flow (small frequent changes), fast feedback (automated tests and monitoring), and continual improvement (blameless review of what broke)."}, {"t": "Map this lab to those pillars — IaC and CI/CD are flow, monitoring and scanning are feedback, the incident review is improvement — so you can see the culture you are about to practice."}, {"t": "Write one honest STAR (Situation, Task, Action, Result) story where you improved a delivery or operations process; you will reuse it in interviews."}], "tshoot": ["Tempted to lead with tools in an interview, resist; the culture answer comes first, the tool answer second.", "Cannot state the business value, tie it to money and risk: faster releases, fewer outages, quicker recovery."], "il6": "Even in classified work the DevOps habits of small reversible changes, full audit trails, and blameless review map straight onto configuration management and continuous monitoring, same discipline at higher stakes."}
+  ]
+},
+{
+  tag:"P1", title:"Infrastructure as Code (Terraform)",
+  sub:"Stop clicking. Define the whole environment as code you can review, version, destroy, and rebuild identically.",
+  mods:[
+    { id:"1.1", rule:"If you changed it in the portal, it will drift and bite you. The pro habit: no manual changes to anything Terraform manages — change the code and re-apply, every time.", name:"Grasp why IaC exists",
+      why:"Infrastructure as Code (IaC) means writing your environment as a blueprint in text instead of building it by hand. Two ideas make it work. First, it is declarative, not imperative — an imperative approach lists the step-by-step HOW (create this, then run that, then this); a declarative blueprint just describes the END STATE you want, and Terraform works out the how. Second, it is idempotent — applying the same blueprint over and over always lands on that same end state, so running it again when reality already matches changes nothing. The result is reviewable, repeatable, and self-documenting: exactly what an auditor wants, and exactly how you avoid 'it works on my machine'.",
+      steps:[
+        {t:"Define the terms — IMPERATIVE: you write the step-by-step HOW, a script of commands. DECLARATIVE: you describe the desired END STATE (what should exist) and the tool figures out the how. Terraform is declarative."},
+        {t:"Define IDEMPOTENT: applying the same config repeatedly produces the same result. Run apply twice and you do not get two of everything — Terraform compares desired against actual, converges to your blueprint, then stops."},
+        {t:"Internalize the loop: write config -> 'terraform plan' (preview) -> 'terraform apply' (build) -> 'terraform destroy' (tear down)."}
+      ],
+      tshoot:["Don't hand-edit resources in the portal after Terraform builds them — you create 'drift' and the next apply may fight you."],
+      il6:"IaC is living documentation for the CM (Configuration Management) family: every change is a reviewable diff, every environment is reproducible evidence." },
+    { id:"1.2", rule:"Always run terraform fmt, then validate, then plan — and read the plan like a receipt before you apply. Applying without reading the plan is how people delete production.", name:"First Terraform project: provider + resource group",
+      why:"Your hello-world. You'll create the same resource group from code that you made by hand, proving code can replace clicks.",
+      steps:[
+        {code:"# main.tf\nterraform {\n  required_providers {\n    azurerm = { source = \"hashicorp/azurerm\", version = \"~> 4.0\" }\n  }\n}\nprovider \"azurerm\" { features {} }\n\nresource \"azurerm_resource_group\" \"core\" {\n  name     = \"rg-lab-core\"\n  location = \"eastus\"\n  tags     = { env = \"lab\", owner = \"isse\" }\n}"},
+        {code:"terraform init     # download provider\nterraform plan     # preview\nterraform apply    # build (type 'yes')"}
+      ],
+      tshoot:["'init' fails to download provider → check the allowed network/proxy; provider registry must be reachable.","'apply' says resource already exists → import it (see 1.5) or destroy the hand-made one first."],
+      il6:"This is your first auditable change record. In a real program this file is checked into version control under CM (Configuration Management)-3 (change control)." },
+    { id:"1.3", rule:"Never keep state on your laptop for anything shared. Remote state with locking is non-negotiable on a team — two people applying at once with local state will corrupt your infrastructure.", name:"Remote state with locking",
+      why:"Terraform tracks reality in a 'state' file. Kept on your laptop it gets lost or corrupted and two people can clobber each other. You move it to Azure Storage so it's durable and locked during changes.",
+      steps:[
+        {t:"Create a storage account + blob container to hold state (do this once, by hand or a bootstrap script)."},
+        {code:"# backend.tf\nterraform {\n  backend \"azurerm\" {\n    resource_group_name  = \"rg-lab-tfstate\"\n    storage_account_name = \"sttfstate<unique>\"\n    container_name       = \"tfstate\"\n    key                  = \"lab.tfstate\"\n  }\n}"},
+        {t:"Run 'terraform init' again to migrate local state to the backend."}
+      ],
+      tshoot:["'Error acquiring the state lock' → a previous run crashed mid-apply. Confirm nothing else is running, then 'terraform force-unlock <LOCK_ID>' (carefully).","State and reality disagree → run 'terraform plan' to see drift before touching anything."],
+      il6:"State integrity is a real CM (Configuration Management)/SI (System and Information Integrity) concern: the state file can contain secrets, so the storage account must be access-controlled and encrypted." },
+    { id:"1.4", rule:"Write it once, reuse it with variables. The moment you copy-paste a resource block, stop and make it a module — duplicated infrastructure code is a future outage.", name:"Variables, outputs, and a reusable module",
+      why:"Hard-coded values don't scale. Variables let one blueprint build dev/test/prod; modules let you reuse a hardened pattern (like 'a secure VM (Virtual Machine)') everywhere instead of copy-pasting.",
+      steps:[
+        {code:"# variables.tf\nvariable \"location\" { default = \"eastus\" }\nvariable \"env\"      { default = \"lab\" }\n\n# outputs.tf\noutput \"rg_name\" { value = azurerm_resource_group.core.name }"},
+        {t:"Refactor your VM build into a ./modules/secure-vm folder and call it from main.tf."}
+      ],
+      tshoot:["Output shows blank → the resource it references may not be created yet; run apply first.","Module change ignored → run 'terraform init' again after adding/moving a module."],
+      il6:"A hardened, reusable module is a 'secure baseline' — exactly the artifact a program reuses to inherit controls across systems." },
+    { id:"1.5", rule:"Touch state by hand only as a last resort, and back it up first. The state commands are sharp tools; always export a copy before surgery so you can undo.", name:"Rollbacks, import, and state surgery",
+      why:"Things break. Being calm during a broken deploy is a core ISSE (Information Systems Security Engineer) skill. You learn to tear down safely, recover from drift, and adopt resources that already exist.",
+      steps:[
+        {code:"terraform destroy                 # full teardown\nterraform destroy -target=azurerm_linux_virtual_machine.web   # just one\nterraform plan -refresh-only       # detect drift without changing anything\nterraform import azurerm_resource_group.core /subscriptions/<id>/resourceGroups/rg-lab-core"}
+      ],
+      tshoot:["A failed apply left half-built resources → fix the config, run apply again (Terraform reconciles); if a resource is wedged, -target it.","'resource already exists' on apply → import it into state instead of recreating.","Never hand-delete a Terraform-managed resource in the portal — run destroy or remove it from state with 'terraform state rm'."],
+      il6:"Clean rollback = contingency/recovery practice (CP (Contingency Planning) family). The ability to rebuild from code in minutes is the ultimate disaster-recovery story." },
+    { id:"1.6", rule:"Tag everything from the first apply — owner, environment, cost-center. Retro-tagging hundreds of resources is misery; bake tags into the module defaults so you never forget.", name:"Tag from day one + the VM (Virtual Machine) bootstrap pattern",
+      why:"Two habits that should exist before your first VM, not after. Tag every resource so it's accountable and billable, and give each VM a minimal first-boot script so it configures itself. Establishing both at the IaC (Infrastructure as Code) foundation keeps the whole environment consistent and auditable instead of retrofitted later.",
+      steps:[
+        {t:"Define a common tag set once in a Terraform 'locals' block and apply 'tags = local.common_tags' to every resource."},
+        {code:"locals {\n  common_tags = {\n    environment        = \"lab\"\n    owner              = \"cloudseamtech\"\n    project            = \"isse-azure-lab\"\n    managedBy          = \"terraform\"\n    dataClassification = \"unclassified-training\"\n  }\n}"},
+        {t:"Attach a minimal bootstrap to each VM: cloud-init via 'custom_data' for Linux, Custom Script Extension for Windows. Do only enough to reach a known, reachable state."},
+        {code:"custom_data = base64encode(file(\"${path.module}/cloud-init-web.yaml\"))"},
+        {t:"Never put secrets in tags or custom_data — pull them at runtime from Key Vault/Delinea. Enforcement of mandatory tags via Azure Policy comes later (module 7.4): define here, enforce there."}
+      ],
+      tshoot:["Tags inconsistent across resources → you applied them by hand per-resource; centralize in 'locals' and reference everywhere.","Bootstrap didn't run → check /var/log/cloud-init-output.log (Linux) or the extension status/logs (Windows).","Half-configured VM that looks fine → add 'set -euo pipefail' to bash so it fails loudly instead of silently."],
+      il6:"Consistent tagging underpins CM (Configuration Management)-8 (system component inventory) and accountability; a documented, re-runnable bootstrap supports CM baselines. Keep real STIG (Security Technical Implementation Guide) hardening in Ansible/OpenSCAP for auditability, not buried in boot scripts." },
+    { id:"1.7", rule:"Scan your code before it ships, not after it deploys. Running tfsec or checkov in your pipeline catches an open port or public storage while it is still one line to fix.", name:"Scan your Infrastructure-as-Code for misconfigurations",
+      why:"You harden servers (OpenSCAP) and watch cloud posture (Defender), but your Terraform itself can ship insecure defaults — a public storage account, a wide-open NSG (Network Security Group), missing encryption. IaC (Infrastructure as Code) scanners read your code before you deploy and flag these, so you catch mistakes for free instead of in production.",
+      steps:[
+        {t:"Run a free scanner — Checkov, tfsec, or Trivy — against your Terraform folder."},
+        {code:"pip install checkov && checkov -d .\n# or:  trivy config ."},
+        {t:"Wire it into the CI/CD (Continuous Integration / Continuous Delivery) pipeline (module 7.3) so every change is scanned automatically before apply."},
+        {t:"Triage: fix the real findings; suppress false positives with an inline comment and a written reason."},
+        {t:"Why + cost: the tools are free, and a misconfig caught here costs nothing — caught in production it costs a rebuild and possibly an incident. Pure time and money saved."}
+      ],
+      tshoot:["Flood of findings on the first run → sort by HIGH/CRITICAL first; many lower ones are sensible defaults you'll keep.","Pipeline blocked by a false positive → suppress that one check with a documented inline skip, never disable the whole scanner."],
+      il6:"Scanning IaC pre-deploy is secure-by-design (SA (System and Services Acquisition)/CM (Configuration Management) families) and the evidence that your environment was compliant from the first commit, not patched into compliance later." },
+    {"id": "1.8", "name": "Make your Terraform scale — reusable modules and per-environment state", "rule": "Anyone can write a Terraform file; the job is writing Terraform that scales. Reusable modules plus separate state per environment is the line between a demo and a system.", "why": "The hard part of Infrastructure as Code is not the syntax, it is structure. As an environment grows, copy-pasted resource blocks drift apart and break. The professional pattern: write small reusable modules once, then call them for each environment (dev, test, prod) with different inputs and a separate remote state file each. Every environment stays identical in shape but independent in blast radius.", "steps": [{"t": "Refactor your network and VM into reusable modules with clear input variables and outputs, building on module 1.4."}, {"t": "Create a per-environment layout: a folder for dev and one for prod, each calling the same modules with its own variable values and its own remote state key."}, {"t": "Deploy dev, confirm it, then deploy prod from the identical modules, proving one blueprint builds both."}, {"t": "Stay DRY (Do not Repeat Yourself): the moment you copy a block a second time, turn it into a module instead."}, {"t": "Why plus cost: separate state means a mistake in dev cannot touch prod, and tearing dev down never risks prod, safer and cheaper at the same time."}], "tshoot": ["Two environments fighting over one state file, give each its own state key or workspace; never share one state across environments.", "A module change breaks every environment at once, version your modules and roll changes environment by environment, dev first."], "il6": "Separate state and environment isolation are how you keep a development sandbox from ever touching an accredited production boundary, the technical backing for separation of environments."}
+  ]
+},
+{
+  tag:"P2", title:"Networking Backbone",
+  sub:"Build the private network spine an enterprise sits on, and learn to keep admin access off the public internet.",
+  mods:[
+    { id:"2.1", rule:"Plan your address space on paper before you build. Overlapping or too-small CIDR ranges are painful later because you cannot resize a VNet in use — measure twice.", name:"VNet, subnets, and hub-and-spoke",
+      why:"A Virtual Network is your private campus. Subnets are buildings inside it. Hub-and-spoke is the enterprise pattern: a central 'hub' (shared services, firewall) with isolated 'spokes' (workloads) — so a breach in one spoke doesn't roam freely.",
+      steps:[
+        {t:"Define one VNet with separate subnets: management, web, domain, and a dedicated AzureBastionSubnet."},
+        {code:"resource \"azurerm_virtual_network\" \"hub\" {\n  name                = \"vnet-lab-hub\"\n  address_space       = [\"10.10.0.0/16\"]\n  location            = var.location\n  resource_group_name = azurerm_resource_group.core.name\n}"}
+      ],
+      tshoot:["Overlapping address ranges between VNets break peering — plan your CIDR blocks up front on paper."],
+      il6:"Segmentation is the SC (System & Communications Protection) family in action — and the classified overlay leans hard on enclave isolation." },
+    { id:"2.2", rule:"Default deny, then open only what you can name. Every allow rule should have a reason you could defend in a review; 'allow any-any' is a finding waiting to happen.", name:"Network Security Groups (least privilege)",
+      why:"NSGs are stateful firewalls on subnets/NICs. The ISSE (Information Systems Security Engineer) mindset is deny-by-default: open only the exact ports a service needs, from the exact sources that need them.",
+      steps:[
+        {t:"Default-deny inbound. Allow only what's required (e.g. 443 to the web subnet) and lock management ports to your bastion subnet."},
+        {t:"Never allow RDP(3389)/SSH (Secure Shell)(22) inbound from the internet — this is a top STIG (Security Technical Implementation Guide) finding."}
+      ],
+      tshoot:["Can't reach a service → check NSG rules in priority order (lower number wins) and confirm rules are on the right subnet/NIC.","Rule looks right but still blocked → there may be a second NSG (NIC + subnet) both applying."],
+      il6:"Default-deny + least privilege is the literal text of multiple AC (Access Control) and SC (System and Communications Protection) controls and a guaranteed STIG check." },
+    { id:"2.3", rule:"No production VM should have a public IP or SSH/RDP open to the world. Admin access goes through Bastion or a jumpbox — full stop. This is the single most common real-world finding.", name:"Secure admin access (Bastion / jumpbox)",
+      why:"Admins need to reach machines without exposing them. Azure Bastion gives you browser-based RDP/SSH (Secure Shell) with no public IP on the target — the cloud version of a hardened jump host.",
+      steps:[
+        {t:"Deploy Azure Bastion into the AzureBastionSubnet (note: it costs money hourly — delete it when done for the day)."},
+        {t:"Cheaper alternative: a single small 'jumpbox' VM (Virtual Machine) you connect through, with everything else private."}
+      ],
+      tshoot:["Bastion connect fails → the subnet must be named exactly 'AzureBastionSubnet' and be at least /26.","Surprise charges → Bastion bills by the hour even idle; tear it down or use a jumpbox for a frugal lab."],
+      il6:"Brokered, logged, no-public-IP admin access maps directly to AC (Access Control)-17 (remote access) and the classified overlay's privileged-access requirements." },
+    { id:"2.4", rule:"When something cannot connect, suspect DNS early. Half of cloud 'network' problems are actually name-resolution problems — nslookup before you blame the firewall.", name:"Private DNS (Domain Name System) and name resolution",
+      why:"Machines need to find each other by name, not IP. Private DNS zones give your VNet (Virtual Network) an internal phonebook — and later, AD (Active Directory) will become the authoritative one.",
+      steps:[
+        {t:"Create a private DNS zone and link it to your VNet so VMs (Virtual Machines) resolve internal names."},
+        {t:"Understand the order: when AD comes online in Phase 3, domain-joined machines point at the DC (Domain Controller) for DNS."}
+      ],
+      tshoot:["VM can't resolve internal names → check the VNet's configured DNS servers; a half-configured custom DNS breaks everything, including internet name resolution."],
+      il6:"Reliable internal name resolution underpins audit log correlation and access control — broken DNS quietly breaks half your security controls." },
+    { id:"2.5", rule:"Work the path in order: NSG, then route table, then DNS, then the host. A calm, layer-by-layer check beats randomly poking rules — and narrating those steps is exactly how you should think out loud in an interview.", name:"Network troubleshooting toolkit",
+      why:"Half of all 'it's broken' tickets are networking. You build the reflexes to diagnose connectivity fast instead of guessing.",
+      steps:[
+        {t:"Use Network Watcher: 'Connection Troubleshoot', 'IP Flow Verify', and 'Effective Security Rules'."},
+        {t:"Enable NSG (Network Security Group) flow logs so you can see what's actually being allowed/denied."},
+        {code:"# from a Linux VM, prove the path step by step\nping 10.10.1.4          # is the host reachable?\nnc -vz 10.10.1.4 443    # is the port open?\nss -tulpn               # what's actually listening here?"}
+      ],
+      tshoot:["'It worked yesterday' → check for a new NSG rule, a route table change, or a stopped service.","Intermittent failures → suspect DNS (Domain Name System) or an NSG applied at two layers."],
+      il6:"Flow logs are audit evidence (AU (Audit and Accountability) family) and the raw material a SIEM (Security Information and Event Management) ingests for detection." },
+    { id:"2.6", rule:"If a platform service supports a private endpoint, use it. Leaving storage or Key Vault on a public endpoint is the kind of default that fails an audit.", name:"Private Endpoints — keep platform services off the internet",
+      why:"Your VMs (Virtual Machines) are private, but Azure platform services like Key Vault and Storage are reachable over the public internet by default. A Private Endpoint gives the service a private address inside your VNet (Virtual Network), so it's only reachable from your network — closing an exposure both auditors and attackers look for.",
+      steps:[
+        {t:"Add a Private Endpoint for your Storage Account and Key Vault, with a private DNS (Domain Name System) zone so the names resolve internally."},
+        {t:"Disable public network access on those services once the private path works."},
+        {t:"Verify from a VM that the service resolves to a 10.10.x.x address, not a public one."},
+        {t:"Why + cost: keeps secrets and storage off the public internet (near-required at IL5 (Impact Level 5)/6). Each endpoint is a small hourly + data charge — modest, and you remove them at teardown to save money."}
+      ],
+      tshoot:["Service unreachable after locking it down → the private DNS zone link to your VNet is missing or misconfigured; the name must resolve to the private IP.","Still resolving to a public IP → the DNS zone/record isn't linked to the VNet."],
+      il6:"Private Endpoints + no public PaaS access map to SC (boundary protection) and are a standard expectation in FedRAMP (Federal Risk and Authorization Management Program) High / IL5+ environments." },
+    { id:"2.7", rule:"Egress control matters as much as ingress — knowing what your environment is allowed to call out to (and proving it) is a maturity signal most engineers miss. And tear the firewall down when done; it bills hourly.", name:"Azure Firewall, UDRs & egress control — and proving it enforces",
+      why:"NSGs (module 2.2) handle basic per-subnet allow/deny, but enterprises add a central Azure Firewall in the hub that ALL traffic is forced through — so you can filter outbound by website name (FQDN (Fully Qualified Domain Name)), inspect traffic in one place, and log it centrally. The skill that actually impresses is proving the control enforces the design, not just deploying it. (Azure Firewall = outbound/east-west control; the App Gateway/WAF (Web Application Firewall) from the front-door design is inbound — they coexist.)",
+      steps:[
+        {t:"Deploy Azure Firewall into the hub's AzureFirewallSubnet — the single security checkpoint for the whole hub-and-spoke."},
+        {t:"Force traffic through it with User Defined Routes (UDRs): a route table on each spoke points 0.0.0.0/0 (all outbound) at the firewall's private IP, so nothing can bypass it ('forced tunneling')."},
+        {t:"Write application rules that allow outbound web by FQDN — e.g., allow microsoft.com and bing.com, deny everything else. That is allow-listing the internet, not just opening ports."},
+        {t:"VALIDATE it (the part that matters): from a Linux VM (Virtual Machine) in a spoke, hit an allowed site and a denied one and watch the firewall enforce the policy."},
+        {code:"curl -I https://www.microsoft.com   # allowed -> 200\ncurl -I https://example.com         # denied -> times out / blocked"},
+        {t:"Confirm in Log Analytics with KQL (Kusto Query Language) — see exactly what was allowed vs denied and why."},
+        {code:"AZFWApplicationRule\n| where TimeGenerated > ago(1h)\n| project TimeGenerated, SourceIp, Fqdn, Action\n| order by TimeGenerated desc\n// legacy workspaces: AzureDiagnostics, category AzureFirewallApplicationRule"},
+        {t:"Cost/time: Azure Firewall is one of the pricier services (bills ~$1+/hour plus data) — deploy it for this module, validate, screenshot the KQL result, then DELETE it. Never leave it running overnight."}
+      ],
+      tshoot:["Traffic not hitting the firewall → the UDR isn't on the right subnet, or a more specific route wins; check 'effective routes' on the spoke NIC.","An allowed site is still blocked → application rules match FQDN + protocol/port; confirm the target FQDN and that DNS (Domain Name System) resolves through the firewall.","No firewall logs in Log Analytics → turn on the firewall's diagnostic settings and point them at the workspace."],
+      il6:"Forced-tunnel egress + FQDN allow-listing + logged, validated enforcement maps to SC (boundary protection) and AU (audit). The 'prove the control actually enforces the design' step IS the RMF (Risk Management Framework) Assess phase — exactly what an assessor wants to see." },
+    {"id": "2.8", "name": "Load balancing, availability zones, and scaling the app tier", "rule": "A single server is a single point of failure. Spreading instances across availability zones behind a load balancer is the cheapest, most-expected resilience move there is, and it is on nearly every Cloud Engineer job description.", "why": "Real applications do not run on one server. You put two or more identical instances behind a load balancer, which spreads traffic and quietly drops any instance that fails a health check. Spreading those instances across Azure availability zones (physically separate datacenters in one region) means a whole datacenter can fail and your app stays up. This is the bread and butter of scaling and high availability.", "steps": [{"t": "Stand up two identical web instances (reuse your AlmaLinux module) in the same region but different availability zones."}, {"t": "Put them behind an Azure Load Balancer for simple layer-4 traffic, or Application Gateway for layer-7 routing with a Web Application Firewall (WAF) when you need HTTPS and protection."}, {"t": "Configure a health probe so the load balancer automatically stops sending traffic to an instance that stops responding."}, {"t": "Prove it: hit the load balancer, then stop one instance, and confirm traffic keeps flowing with no visible outage."}, {"t": "Sketch the next step up: for multiple regions, Azure Front Door or Traffic Manager routes users to the nearest healthy region."}, {"t": "Why plus cost: zone redundancy is usually free since you already pay for the instances; multi-region roughly doubles cost, so reserve it for what truly needs it."}], "tshoot": ["Load balancer shows every instance unhealthy, your probe path or port is wrong, or an NSG is blocking the probe; check the probe first.", "Traffic only ever lands on one instance, check the load-balancing rule and the session-persistence setting."], "il6": "High availability across zones supports the availability leg of confidentiality-integrity-availability and the contingency-planning controls every authorized system must satisfy."}
+  ]
+},
+{
+  tag:"P3", title:"Active Directory, DNS (Domain Name System) & GPO (Group Policy Object)",
+  sub:"Stand up the Windows identity backbone — the phonebook and the bouncer for the whole enterprise.",
+  mods:[
+    { id:"3.1", rule:"Give a domain controller a static private IP and point its DNS at itself. A DC with a changing IP or wrong DNS is a self-inflicted outage — this is muscle memory for Windows admins.", name:"Deploy a Windows Server DC from Terraform",
+      why:"Active Directory is where enterprise identity lives. You start by deploying a clean Windows Server VM (Virtual Machine) as code, ready to be promoted to a domain controller.",
+      steps:[
+        {t:"Terraform an azurerm_windows_virtual_machine (B-series, auto-shutdown). Give it a static private IP — DCs (Domain Controllers) must not move."},
+        {t:"Reach it only through the bastion/jumpbox; no public RDP."}
+      ],
+      tshoot:["Lost the admin password → reset it via the Azure portal's 'Reset password' (VMAccess extension), not by rebuilding."],
+      il6:"A static, privately-accessed DC is the anchor of the IA (Identification and Authentication) and AC (Access Control) families for the whole domain." },
+    { id:"3.2", rule:"Let AD install its own DNS and keep them together. AD and DNS are joined at the hip; replication and logon both break the moment DNS is wrong.", name:"Promote to AD DS (Active Directory Domain Services) + integrated DNS (Domain Name System)",
+      why:"Promotion turns the server into the domain's authority. In plain terms: AD is the bouncer (who are you, what can you touch) and AD-integrated DNS is the phonebook (where is everything). They're joined at the hip.",
+      steps:[
+        {t:"Install the AD DS role and promote to a new forest; let it install DNS at the same time."},
+        {code:"# PowerShell on the server\nInstall-WindowsFeature AD-Domain-Services -IncludeManagementTools\nInstall-ADDSForest -DomainName \"lab.local\" -InstallDns"},
+        {t:"Point the VNet (Virtual Network)'s DNS at the DC (Domain Controller)'s private IP so domain members can find it."}
+      ],
+      tshoot:["Members can't join the domain → almost always DNS: clients must use the DC for DNS, not Azure's default resolver.","Promotion reboots and seems stuck → DCPROMO takes time; give it a few minutes before assuming failure."],
+      il6:"This single step instantiates centralized authentication — the backbone auditors examine first." },
+    { id:"3.3", rule:"Design OUs around how you will target policy, not the org chart. You apply GPOs to OUs, so structure them around what you need to manage, not who reports to whom.", name:"OUs, two domain-joined clients, and a test user",
+      why:"You organize the domain into Organizational Units (folders for policy), join at least two client machines so policy and authentication have somewhere real to land, and create users — the raw material for access control. Two clients let you prove a GPO and a domain login work across more than one machine, which a single box can never show.",
+      steps:[
+        {t:"Create OUs (e.g. Servers, Workstations, Admins), a standard user, and a separate admin account (never daily-drive an admin)."},
+        {t:"Client 1 (Windows): Terraform a small Windows Server VM (Virtual Machine) to act as the 'workstation' — client OS images (Windows 11) require an Enterprise E3/E5 or Visual Studio dev/test license on Azure, while Server's license is included in the VM price and domain-join/GPO behave the same. Set its DNS (Domain Name System) to the DC (Domain Controller)'s private IP and join it into the Workstations OU (Organizational Unit)."},
+        {t:"Client 2 (Linux, loop-back step): when you build your AlmaLinux server in Phase 4, come back here — point its DNS at the DC and domain-join it to AD (Active Directory) with 'realm join' + SSSD (System Security Services Daemon). A cross-platform join is a genuinely marketable skill."},
+        {t:"Log in to each client as your test domain user to prove authentication works on both, then confirm a simple GPO (Group Policy Object) applies to the Workstations OU."},
+        {t:"Cost/teardown: that is two more VMs — keep them B-series with auto-shutdown, and 'terraform destroy' the clients when this phase is done."}
+      ],
+      tshoot:["Domain-join cannot find the domain → the client's DNS is not pointed at the DC; AD join is DNS-first, fix that before anything else.","Linux 'realm join' fails → check time sync (chrony) and that the DC resolves the domain; SSSD is unforgiving about both.","Join succeeds but GPO (Group Policy Object) won't apply → run 'gpupdate /force' and check the machine is in the right OU."],
+      il6:"OU structure + separation of admin and user accounts is the technical basis for least privilege and separation of duties (AC (Access Control) family)." },
+    { id:"3.4", rule:"Test a hardening GPO on one machine before scoping it widely. A bad baseline pushed domain-wide can lock everyone out — ring it out on a pilot OU first.", name:"Apply a DISA STIG (Security Technical Implementation Guide) GPO baseline",
+      why:"Windows hardening at scale happens through Group Policy. DISA ships STIG GPO baselines you import and link — instantly enforcing hundreds of required settings.",
+      steps:[
+        {t:"Download the DISA Windows Server STIG GPO package, import the GPOs (Group Policy Objects), and link them to the right OU (Organizational Unit)."},
+        {t:"Scan with the SCAP Compliance Checker / Evaluate-STIG and review findings in STIG Viewer."}
+      ],
+      tshoot:["A STIG setting breaks management access → that's why you test in an OU first; back the one GPO out, document the deviation.","GPO 'linked' but not enforced → check link order and 'Enforced'/'Block Inheritance' flags."],
+      il6:"Imported STIG GPOs are pre-built control implementations; the scan output is your assessment evidence." },
+    { id:"3.5", rule:"When logons or replication act up, check time and DNS first. Kerberos breaks if clocks drift past five minutes; most 'weird AD' issues are time or DNS, not AD itself.", name:"AD (Active Directory) account & replication troubleshooting",
+      why:"Account lockouts, stale objects, and DNS (Domain Name System) faults are the daily bread of identity ops. You build a methodical checklist so you fix root causes, not symptoms.",
+      steps:[
+        {code:":: from a domain-joined host\nnltest /dsgetdc:lab.local        :: which DC am I using?\nrepadmin /replsummary            :: replication health (multi-DC)\ndcdiag /v                        :: DC health checks\nSearch-ADAccount -LockedOut      :: PowerShell: who's locked out"}
+      ],
+      tshoot:["User locked out repeatedly → hunt a stale credential: a mapped drive, phone, or service running as that user.","Authentication flaky → almost always DNS or time; verify both before anything exotic."],
+      il6:"Account lifecycle management (provisioning, lockout, disablement) is heavily controlled (AC (Access Control)-2) and a frequent audit focus." }
+  ]
+},
+{
+  tag:"P4", title:"Linux: AlmaLinux, NGINX, Containers",
+  sub:"Stand up a AlmaLinux web host, harden it to a STIG (Security Technical Implementation Guide) baseline, and run containers the RHEL-world way.",
+  mods:[
+    { id:"4.1", rule:"Bake hardening into the image or bootstrap — do not click it in afterward. A server born hardened from code is repeatable; a hand-tuned one is a snowflake you cannot rebuild.", name:"Deploy an AlmaLinux VM (Virtual Machine) from Terraform",
+      why:"AlmaLinux is the free, RHEL (Red Hat Enterprise Linux)-compatible distro Azure offers at no cost (Microsoft-endorsed) — same dnf, SELinux, and firewalld as RHEL. Rocky has no free Azure image and RHEL itself adds a licensing charge, so AlmaLinux keeps the lab free; everything here transfers 1:1 to Rocky/RHEL on the job. You deploy it as code so the build is repeatable. Use the 9 release for the widest tooling and STIG (Security Technical Implementation Guide) coverage today.",
+      steps:[
+        {t:"Find the AlmaLinux 9 image (free, Microsoft-endorsed) in the Azure Marketplace and reference it in a Terraform azurerm_linux_virtual_machine block (B-series, SSH (Secure Shell)-key auth only, auto-shutdown enabled)."},
+        {t:"No password auth — SSH keys only. This is both a security baseline and a STIG requirement."}
+      ],
+      tshoot:["Marketplace image needs terms accepted → run 'az vm image terms accept' for that publisher/offer once.","Can't SSH in → check the NSG (Network Security Group) allows 22 from your bastion/jumpbox only, and that you used the right private key."],
+      il6:"A scripted, key-only Linux build is your first hardened baseline under CM (Configuration Management) and IA (Identification and Authentication) controls." },
+    { id:"4.2", rule:"Never fix an SELinux problem by turning SELinux off. The pro move is to find the denial and set the right context or boolean — 'setenforce 0' on a resume is a red flag.", name:"Harden it: SSH (Secure Shell), firewalld, SELinux (Security-Enhanced Linux), OpenSCAP STIG (Security Technical Implementation Guide) scan",
+      why:"This is the beating heart of Linux ISSE (Information Systems Security Engineer) work. A fresh OS (Operating System) is not compliant — you scan it against the DISA STIG, read the findings, and remediate. OpenSCAP automates both the check and much of the fix.",
+      steps:[
+        {t:"Confirm SELinux is enforcing and firewalld is on; tighten /etc/ssh/sshd_config (no root login, key-only, modern ciphers)."},
+        {code:"sudo getenforce                 # should say 'Enforcing'\nsudo systemctl status firewalld\n\n# install + run a DISA STIG scan with OpenSCAP\nsudo dnf install -y openscap-scanner scap-security-guide\nsudo oscap xccdf eval \\\n  --profile xccdf_org.ssgproject.content_profile_stig \\\n  --results scan.xml --report report.html \\\n  /usr/share/xml/scap/ssg/content/ssg-rl9-ds.xml"},
+        {t:"Open report.html, triage findings by severity, remediate, and re-scan until clean (or documented)."}
+      ],
+      tshoot:["Something breaks after hardening (app won't start) → SELinux denials show in 'sudo ausearch -m avc -ts recent'; create a proper policy, don't just disable SELinux.","Scan profile name not found → list profiles with 'oscap info' on the datastream file."],
+      il6:"This is a literal control-assessment step. The scan report is the evidence; remaining findings become POA&M (Plan of Action and Milestones) line items." },
+    { id:"4.3", rule:"Automate certificate renewal from day one. With public cert lifetimes shrinking toward 47 days, manual renewal is a guaranteed future outage — set up ACME and forget it.", name:"NGINX as a hardened TLS (Transport Layer Security) reverse proxy",
+      why:"NGINX serves web content and shields back-end apps; hardened, it's a security control itself (TLS, strong ciphers, security headers). The certificate is the heart of TLS — and how you obtain and renew it differs completely between an internal site and a public one.",
+      steps:[
+        {t:"Install NGINX, serve a test page, force TLS 1.2+, add security headers (HSTS, X-Content-Type-Options), disable server tokens, and redirect HTTP→HTTPS."},
+        {t:"Generate a cert for INTERNAL users. In the lab a self-signed cert is fine; in a real internal site you issue it from your own internal CA (e.g., Active Directory Certificate Services) and push that CA root to internal machines via GPO (Group Policy Object)/Intune so browsers trust it with no warnings."},
+        {code:"sudo dnf install -y nginx\nsudo systemctl enable --now nginx\nsudo firewall-cmd --add-service=https --permanent && sudo firewall-cmd --reload\nsudo nginx -t        # validate config before reloading"},
+        {code:"# self-signed cert for the lab (internal users)\nsudo openssl req -x509 -newkey rsa:2048 -nodes -days 365 -keyout /etc/pki/tls/private/web.key -out /etc/pki/tls/certs/web.crt -subj \"/CN=web.lab.local\""},
+        {t:"In a container (module 4.4): mount the cert and key as a read-only volume, or fetch them from Key Vault at startup — never bake the private key into the image."},
+        {t:"PUBLIC-facing is different. A public site needs a cert from a publicly-trusted CA (Let's Encrypt, DigiCert) that browsers already trust — a self-signed/internal cert would throw warnings — and you must prove you control the public DNS (Domain Name System) name (domain validation). It typically sits in a DMZ (demilitarized zone): a perimeter network walled off from the internal network by firewalls, fronted by a WAF (Web Application Firewall)/Application Gateway that usually terminates TLS there, not on the origin."},
+        {t:"Updating the cert is what changes most. Internal certs from your own CA are exempt from public rules — keep them long-lived and renew on your schedule. Public certs are short-lived and shrinking: as of March 2026 the max is 200 days, dropping to 100 (2027) and 47 (2029), so renewal MUST be automated — ACME (certbot/Let's Encrypt, ~90-day cycles) or platform-managed (Azure Application Gateway / Front Door / Key Vault auto-rotation). Manual renewal of a public cert is how outages happen."}
+      ],
+      tshoot:["403/permission denied serving files → SELinux (Security-Enhanced Linux) context on the web root; fix with 'restorecon -Rv /usr/share/nginx/html'.","'nginx -t' fails → it tells you the exact file:line of the syntax error; fix before reload.","Browser warning on the internal self-signed cert → expected; trust it by adding your internal CA root to the client, never by disabling TLS."],
+      il6:"TLS config + cert lifecycle map to SC (System and Communications Protection) controls (SC-8 / SC-12 / SC-13) and the NGINX STIG (Security Technical Implementation Guide); in gov, an internal/DoD (Department of Defense) PKI (Public Key Infrastructure) issues certs for internal sites, while public endpoints sit in the DMZ behind a WAF using automated, short-lived public certs." },
+    { id:"4.4", rule:"Run containers rootless by default. If a container does not need root, it should not have it — least privilege applies to containers exactly like it does to users.", name:"Containers with Podman (rootless)",
+      why:"In the RHEL/gov world Podman is preferred over Docker — it's daemonless and runs rootless, shrinking the attack surface. You learn to run a containerized app safely.",
+      steps:[
+        {t:"Install Podman, run a container as a non-root user, and map it behind your NGINX proxy."},
+        {code:"sudo dnf install -y podman\npodman run -d --name web -p 8080:80 docker.io/library/nginx:stable\npodman ps\npodman generate systemd --new web > ~/.config/systemd/user/web.service  # persist it"}
+      ],
+      tshoot:["Rootless container can't bind low ports (<1024) → that's by design; use a high port and proxy to it, or set net.ipv4.ip_unprivileged_port_start.","Container vanishes after logout → enable lingering: 'loginctl enable-linger <user>'."],
+      il6:"Rootless + image provenance + scanning ties into SI (system integrity) and supply-chain control expectations." },
+    { id:"4.5", rule:"When a disk fills, find the cause before you delete. Use du to locate it, check for a process still writing or a deleted-but-open file (lsof), then add an alert so it never surprises you again.", name:"Linux storage troubleshooting (the classic 'disk full')",
+      why:"'No space left on device' will eventually break a deploy or stop logging — a real security problem (lost audit logs). You learn to diagnose and grow storage calmly.",
+      steps:[
+        {code:"df -h                 # which filesystem is full?\ndu -xh / | sort -rh | head   # what's eating it?\nlsblk                 # see disks/partitions\n# after attaching a bigger Azure data disk + LVM:\nsudo pvresize /dev/sdc\nsudo lvextend -r -l +100%FREE /dev/mapper/rootvg-rootlv\n\n# OS disk grown in Azure, no LVM? grow partition, then filesystem:\nsudo growpart /dev/sda 2\nsudo xfs_growfs /        # (or resize2fs for ext4)"}
+      ],
+      tshoot:["df shows space but writes still fail → you're out of inodes ('df -i'), not bytes — usually millions of tiny files.","Disk grown in Azure but Linux doesn't see it → you must extend the partition + filesystem inside the OS (Operating System); the cloud only grew the raw disk."],
+      il6:"Audit logs filling a disk and halting logging is an AU (Audit and Accountability)-control failure — capacity monitoring is a security requirement, not just ops hygiene." },
+    { id:"4.6", rule:"Read the logs first, guess second. systemctl status then journalctl -u tells you what actually failed — engineers who read logs fix things in minutes; the rest flail for hours.", name:"Linux common issues & quick fixes (SELinux (Security-Enhanced Linux), firewall, systemd…)",
+      why:"The same handful of problems cause most Linux 'it's broken' moments — and a hardened gov box hits them more, because SELinux and the host firewall are locked down by default. Knowing the 5-minute diagnosis for each is what separates calm from flailing.",
+      steps:[
+        {t:"Diagnose in this order and most things fall out: (1) is the service running? (2) what do its logs say? (3) is SELinux blocking it? (4) is the firewall blocking it? (5) is it DNS (Domain Name System) or time? (6) is anything actually LISTENING on the port? (7) is it permissions/ownership?"},
+        {t:"Service won't start → check status, then the journal."},
+        {code:"systemctl status nginx\njournalctl -u nginx -e\njournalctl -xe"},
+        {t:"SELinux is blocking it (works with SELinux off, fails on) → find the denial and fix the context or a boolean. Never leave SELinux disabled — that's a STIG (Security Technical Implementation Guide) finding."},
+        {code:"sudo ausearch -m avc -ts recent\nsudo restorecon -Rv /path/to/files\nsudo setsebool -P <boolean_name> on"},
+        {t:"Firewall is blocking a port → list what's open, then add the port and reload."},
+        {code:"sudo firewall-cmd --list-all\nsudo firewall-cmd --add-port=8080/tcp --permanent\nsudo firewall-cmd --reload"},
+        {t:"Service 'running' but connections refused → is it actually listening, and on what address? A service bound to 127.0.0.1 only answers itself; bound to 0.0.0.0 it answers the network. ss shows you the truth."},
+        {code:"ss -tlnp | grep 8080      # listening? on which address/port?\n# 127.0.0.1:8080 = localhost only — fix the bind address in the app config"},
+        {t:"'Permission denied' in the logs → ownership or mode is wrong (or SELinux context — check both). The web server's user must be able to read its files."},
+        {code:"ls -lZ /var/www/html       # owner, mode, AND SELinux context\nsudo chown -R nginx:nginx /var/www/html\nsudo chmod -R u=rwX,g=rX,o=rX /var/www/html"},
+        {t:"Permission denied that isn't SELinux → check owner/mode (ls -l) AND the SELinux label (ls -Z); fix whichever is wrong."},
+        {code:"ls -lZ /path\nsudo chown user:group file\nsudo chmod 640 file"},
+        {t:"Locked out of SSH (Secure Shell) → usually key permissions or a bad sshd config; confirm via the cloud serial console, not SSH."},
+        {code:"chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys\nsudo sshd -t"},
+        {t:"Name resolution fails → check which DNS the host uses (NetworkManager/systemd-resolved). Once AD (Active Directory) is up, domain members must point at the DC (Domain Controller)."},
+        {code:"resolvectl status\nnslookup web.lab.local"},
+        {t:"Clock drift breaks Kerberos/AD auth past ~5 minutes → check time sync."},
+        {code:"chronyc sources\ntimedatectl"}
+      ],
+      tshoot:["Tempted to 'fix' it by disabling SELinux or opening the firewall wide → that fix is exactly the finding an assessor writes up; correct the context/boolean or open the one needed port instead.","Can't tell what changed → 'journalctl -xe' plus the service's own log usually name the exact file and line."],
+      il6:"SELinux enforcing, host firewall on, time synced, and logs intact are explicit DISA STIG requirements (AC (Access Control)/SC (System and Communications Protection)/AU (Audit and Accountability)/IA (Identification and Authentication) families). The marketable skill isn't making errors disappear — it's making them disappear the compliant way." },
+    { id:"4.7", rule:"Measure before you tune, and scale out before you scale up. Grab a baseline (top, vmstat) so you can prove the change helped, and let the platform add instances rather than building one giant server.", name:"Performance, optimization & elastic scale (Linux + cloud)",
+      why:"The JD says 'optimize servers' and run a 'fleet' — cloud-native that means two things: tune the individual Linux host, and let the platform add/remove hosts automatically under load. This is the cloud answer to a data center full of servers.",
+      steps:[
+        {t:"Find the bottleneck before changing anything — CPU, memory, or disk. Use the Linux performance toolkit."},
+        {code:"top            # live CPU/memory\niostat -xz 1   # disk I/O (often the real culprit)\nvmstat 1       # memory + CPU pressure\nsar -r         # historical memory usage"},
+        {t:"Apply a tuned profile and targeted sysctl tweaks for the workload, instead of guessing."},
+        {code:"sudo tuned-adm profile throughput-performance\nsudo sysctl -w net.core.somaxconn=1024"},
+        {t:"Right-size in the cloud: match VM (Virtual Machine) size and disk tier to the MEASURED load — small B-series when idle, Premium SSD only where IOPS actually matter. Wrong size means wasted money or throttling."},
+        {t:"Scale the fleet automatically: a VM Scale Set with an autoscale rule adds Linux instances when CPU is high and removes them when idle — the cloud version of 'more servers,' but as code and pay-per-use."},
+        {t:"Cost/time: right-sizing + autoscale is the single biggest lever for performance AND cost — you stop paying for idle capacity and never scale by hand."}
+      ],
+      tshoot:["App slow but CPU looks fine → check disk (iostat) and memory (vmstat) first; the bottleneck is usually I/O or RAM, not CPU.","Autoscale not triggering → check the metric, the threshold, and the cooldown period on the scale rule."],
+      il6:"Capacity and performance management map to the CP (Contingency Planning) and SC (System and Communications Protection) families; autoscaling is also resilience — a load spike adds capacity instead of taking the service down." }
+  ]
+},
+{
+  tag:"P5", title:"Patch & Endpoint Management",
+  sub:"Keep everything updated and policy-compliant — with an honest take on the WSUS (Windows Server Update Services)-to-cloud transition.",
+  mods:[
+    { id:"5.1", rule:"Patch in rings — a test group first, then broad, never everything at once. Staging the rollout is the habit that prevents 'we patched and broke production'.", name:"Stand up WSUS (and know it's deprecated)",
+      why:"WSUS is the classic on-prem Windows patch server. You still learn it because it's everywhere in existing gov/classified networks — but know the truth: Microsoft deprecated WSUS in Sept 2024. It still works and is supported through ~2029 (Server 2025 lifecycle, extended to ~2034), but gets no new features.",
+      steps:[
+        {t:"Install the WSUS role on a member server, point it at a downstream classifications/products set, and approve updates to a test group."},
+        {t:"Configure clients via GPO (Group Policy Object) to pull updates from your WSUS server."}
+      ],
+      tshoot:["Clients not reporting in → check the GPO 'Specify intranet Microsoft update service location' URL and run 'wuauclt /reportnow' (or 'usoclient').","WSUS DB/disk ballooning → run the Server Cleanup Wizard; the WSUSContent folder is a notorious storage hog (ties back to P3.5 disk-full skills)."],
+      il6:"Patch management is the SI (System and Information Integrity) family (flaw remediation). In disconnected classified enclaves, an on-prem distribution point like WSUS is often still required." },
+    { id:"5.2", rule:"Schedule patches in a maintenance window and report compliance. Patching is not done when it is applied — it is done when you can show what is compliant and what is not.", name:"Azure Update Manager (the modern successor)",
+      why:"For servers, Microsoft now points you to Azure Update Manager — cloud-driven patch orchestration with scheduling and compliance reporting. You learn the tool the field is moving toward.",
+      steps:[
+        {t:"Onboard your Linux and Windows VMs (Virtual Machines), run an assessment, and schedule a maintenance window."},
+        {t:"Compare its compliance view to your WSUS (Windows Server Update Services) approvals — same goal, cloud-native delivery."}
+      ],
+      tshoot:["VM shows 'not assessed' → check the VM has outbound access to update endpoints and the prerequisites/agent are healthy."],
+      il6:"Centralized patch compliance reporting is exactly the evidence an assessor wants for flaw-remediation controls." },
+    { id:"5.3", rule:"Define compliance as policy, then let noncompliant devices be blocked, not nagged. Enforcement that actually gates access is what auditors want to see.", name:"Intune enrollment & compliance policies",
+      why:"Intune manages endpoints from the cloud: enrollment, configuration profiles, and compliance policies that gate access. It needs a license — use a free EMS E5 or M365 Business Premium trial so the lab stays cheap.",
+      steps:[
+        {t:"Start a free Intune/EMS trial, enroll a Windows client, and push a configuration profile (e.g. BitLocker, password policy)."},
+        {t:"Create a compliance policy and wire it to a Conditional Access rule (compliant device required)."}
+      ],
+      tshoot:["Enrollment fails → check the user has a license assigned and MDM auto-enrollment scope includes them.","Policy 'assigned' but device not compliant → give it a sync cycle; force from Company Portal / Settings."],
+      il6:"Device compliance + Conditional Access is modern Zero-Trust access control — increasingly central to gov endpoint requirements." },
+    { id:"5.4", rule:"Keep an eye on disk and content bloat on patch servers. Update content silently eats disk; a scheduled cleanup keeps the whole pipeline from stalling.", name:"Patch troubleshooting & content cleanup",
+      why:"Patch systems fail in a few predictable ways. You build a triage habit so 'compliance dropped' becomes a 10-minute fix, not a mystery.",
+      steps:[
+        {code:":: Windows update engine reset (common fix)\nnet stop wuauserv & net stop bits\n:: clear SoftwareDistribution, then\nnet start wuauserv & net start bits\nwuauclt /detectnow /reportnow"}
+      ],
+      tshoot:["A specific update keeps failing → note the 0x error code; most map to a known KB fix.","Many clients silently stopped reporting → suspect a GPO (Group Policy Object) change or the WSUS (Windows Server Update Services) server out of disk."],
+      il6:"Demonstrable, timely patch compliance is one of the most scrutinized SI (System and Information Integrity) controls in any ATO (Authorization to Operate) package." },
+    { id:"5.5", rule:"Whatever the tool, the discipline is the same: inventory, target, stage, report. Tools change (WSUS to MECM to Intune); the rings-and-reporting habit is what transfers.", name:"MECM / Configuration Manager — the brain over WSUS (Windows Server Update Services)",
+      why:"WSUS is the update warehouse; MECM (Microsoft Configuration Manager, formerly SCCM/MECM) is the control panel that drives it across the whole fleet — precise targeting, scheduling, compliance reporting, plus software and OS (Operating System) deployment. In most enterprises and classified networks this is how the bulk of Windows updates actually ship. MECM doesn't replace WSUS; it plugs into it through the Software Update Point (SUP) role.",
+      steps:[
+        {t:"Install a Configuration Manager site server on Windows Server (SQL + IIS + prerequisites) — this is the heaviest build in the lab, so budget time."},
+        {t:"Add the Software Update Point role on the server that has WSUS; MECM then drives WSUS's catalog and synchronization."},
+        {t:"Create device collections, build an update group, deploy to a test collection with a maintenance window, and watch compliance roll in."},
+        {code:":: SUP role is added in the console:\n:: Administration > Site Configuration > Servers and Site System Roles\n::   > Add Site System Roles > Software update point"}
+      ],
+      tshoot:["SUP won't sync → WSUS itself must be healthy first; fix WSUS before blaming MECM.","Clients show no compliance → confirm the MECM client is installed (client push) and the management point is reachable.","Disk filling → both the WSUS content folder and MECM's content store grow; apply the same cleanup discipline as module 5.1 and the Linux disk-full skills."],
+      il6:"MECM + WSUS plus the offline export/import method (see disconnected patching) is how large classified networks distribute patches and prove SI (System and Information Integrity)-2 flaw-remediation compliance at scale. ConfigMgr is actively supported, unlike standalone WSUS." },
+    { id:"5.6", rule:"Patch Linux the same way you patch Windows: rings, windows, and proof. Update Manager plus Ansible gives you fleet patching with a report; ad-hoc updates on each box do not scale.", name:"Linux patch management at scale (cloud-native)",
+      why:"The JD wants you to 'lead OS (Operating System) patch management' — test, schedule, deploy, validate, report. For a fleet of Linux servers the cloud-native way is Azure Update Manager plus Ansible, with no on-prem patch server (no Satellite/WSUS (Windows Server Update Services) box to run).",
+      steps:[
+        {t:"Onboard your Linux VMs (Virtual Machines) to Azure Update Manager and run an assessment to see missing packages across the fleet."},
+        {t:"Create a scheduled maintenance configuration (a maintenance window) and target VMs by TAG — patch a test ring first, then production."},
+        {t:"Validate after the window and export the compliance report — that report is the 'reporting' deliverable the JD asks for."},
+        {t:"Use Ansible for what Update Manager doesn't do — pre/post tasks, config drift, app restarts — as an idempotent playbook run against a group."},
+        {code:"sudo dnf check-update             # what's pending on a host\nansible-playbook patch.yml --limit test   # patch the test ring first"},
+        {t:"Cost/time: Azure Update Manager is free for Azure VMs, and tag-based scheduling saves hours versus SSH (Secure Shell)-ing into each box."}
+      ],
+      tshoot:["VM shows 'not assessed' → confirm it has outbound access to the update endpoints and the agent/prerequisites are healthy.","A patch breaks an app → exactly why you patch a test ring first and snapshot before the window (ties to backup/DR)."],
+      il6:"Scheduled, reported, tested patch compliance is the SI (System and Information Integrity)-2 flaw-remediation control — and is literally what 'lead patch management' means in an ATO (Authorization to Operate) package." }
+  ]
+},
+{
+  tag:"P6", title:"Security Tooling & Monitoring",
+  sub:"Add the eyes and ears: posture management, centralized logging, vulnerability and compliance scanning, key management.",
+  mods:[
+    { id:"6.1", rule:"Treat the secure score as a worklist, not a grade. Work the highest-impact recommendations first — being able to say 'we moved from 55 to 80 percent and here is how' is a great interview line.", name:"Microsoft Defender for Cloud (posture + compliance)",
+      why:"Defender for Cloud continuously scores your environment's security posture and maps it to compliance standards (incl. NIST (National Institute of Standards and Technology) 800-53 / FedRAMP (Federal Risk and Authorization Management Program)). It's the closest thing to an automated, always-on assessor.",
+      steps:[
+        {t:"Enable Defender for Cloud, review your Secure Score, and open the Regulatory Compliance dashboard."},
+        {t:"Work the recommendations down — each fix raises the score and closes a control gap."}
+      ],
+      tshoot:["Score stuck low → many recommendations target identity/MFA (Multi-Factor Authentication) and exposed management ports; knock those out first.","Plan costs appearing → some Defender plans are paid per-resource; enable selectively in a lab."],
+      il6:"The Regulatory Compliance view is a live control-status report — the dream artifact for continuous monitoring (the 6th RMF (Risk Management Framework) step)." },
+    { id:"6.2", rule:"Centralize logs before you need them. The day of an incident is too late to start collecting — if it is not in the workspace, it did not happen as far as forensics is concerned.", name:"Centralized logging + Sentinel SIEM (Security Information and Event Management)",
+      why:"Scattered logs are useless. A Log Analytics workspace is your central recorder; Microsoft Sentinel turns it into a SIEM that hunts threats. Plain terms: the building's DVR, plus a guard who watches the feeds.",
+      steps:[
+        {t:"Enterprise/DoD shops run Trellix (ESS/HBSS) for endpoint protection — your free, open-source equivalent is Wazuh: deploy its agent on your Linux and Windows VMs and you get endpoint detection, file-integrity monitoring, and even built-in SCA hardening checks feeding one dashboard, the same pattern at zero cost."},
+        {t:"Create a Log Analytics workspace and route VM (Virtual Machine), NSG (Network Security Group) flow, and activity logs into it."},
+        {t:"(Optional, watch cost) Enable Sentinel and run a few KQL (Kusto Query Language) queries / a built-in analytics rule."},
+        {code:"// KQL: recent failed Windows sign-ins\nSecurityEvent\n| where EventID == 4625\n| summarize attempts=count() by Account, bin(TimeGenerated, 1h)\n| order by attempts desc"}
+      ],
+      tshoot:["No data flowing in → confirm the data connector / agent is deployed and the VM can reach the workspace.","Sentinel bill climbing → ingestion is billed per GB; filter noisy logs and set a daily cap in the lab."],
+      il6:"Central log collection + retention + alerting is the entire AU (Audit & Accountability) family, and the overlay tightens retention." },
+    { id:"6.3", rule:"A scan you do not act on is just a report. Close the loop: scan, prioritize by exploitability, remediate, rescan to confirm — that last step is the one people skip.", name:"Vulnerability scanning",
+      why:"Hardening assumes; scanning verifies. You run a vulnerability assessment to find missing patches and weak configs an attacker would target.",
+      steps:[
+        {t:"Free home-lab scanners: Nessus Essentials (free for up to 16 IPs — the same Tenable engine family the DoD's ACAS program is built on), Trivy for container images and IaC, and OpenVAS/Greenbone as a fully open-source network scanner."},
+        {t:"Use Defender for Cloud's built-in vulnerability assessment on your VMs (or stand up Nessus Essentials, free for up to 16 IPs)."},
+        {t:"Triage by CVSS severity, remediate, rescan, and track what you can't fix yet."}
+      ],
+      tshoot:["Scan returns nothing → the scanner agent/extension may not be deployed or has no network path to the target.","Overwhelming finding count → sort by exploitable/critical first; not every finding is equal."],
+      il6:"Vulnerability scanning is RA (Risk Assessment)-5, a non-negotiable control; results feed both remediation and the POA&M (Plan of Action and Milestones)." },
+    { id:"6.4", rule:"Capture evidence as you go, not at audit time. A screenshot or export the moment you fix something saves a frantic week before an assessment.", name:"Compliance scanning & evidence capture",
+      why:"An assessor doesn't take your word — they want proof. You learn to run STIG/SCAP scans across Linux and Windows and package the output as audit evidence.",
+      steps:[
+        {t:"Re-run OpenSCAP (Linux) and SCC (SCAP Compliance Checker) on Windows — SCC is a free public download from NIWC Atlantic, no CAC (Common Access Card) needed; Evaluate-STIG may still require DoD repo access, so SCC + the public DISA STIG Viewer is the home-lab path."},
+        {t:"Export the reports and organize them as evidence per control."}
+      ],
+      tshoot:["Windows and Linux findings live in different tools → STIG Viewer (with checklists) is your common home for tracking both.","A 'failed' check that's actually mitigated → mark it Not_Applicable / Open with a justification, don't fake a pass."],
+      il6:"This is the Assess step of RMF (Risk Management Framework) made tangible — your checklists and reports literally become the ATO (Authorization to Operate) package." },
+    { id:"6.5", rule:"Secrets never live in code or config files — they live in Key Vault and apps fetch them at runtime via managed identity. A secret in a git repo is a breach in waiting.", name:"Key Vault & customer-managed encryption",
+      why:"At IL5 (Impact Level 5)/IL6 (Impact Level 6), you must hold your own encryption keys. Azure Key Vault stores keys/secrets in FIPS (Federal Information Processing Standards) 140-validated hardware; customer-managed keys (CMK (Customer-Managed Key)) prove the mission owner — not the cloud — controls the data.",
+      steps:[
+        {t:"Create a Key Vault, generate a key, and configure customer-managed key encryption on a storage account/disk."},
+        {t:"Move secrets (like your TLS (Transport Layer Security) material) out of code and into Key Vault."}
+      ],
+      tshoot:["App can't read a secret → it's RBAC (Role-Based Access Control)/access-policy on the vault, plus the identity must be granted; check both.","Accidentally deleted a key → soft-delete/purge protection lets you recover; enable it before you need it."],
+      il6:"CMK in FIPS-validated HSMs is the explicit DoD (Department of Defense) requirement for data-at-rest control (SC (System and Communications Protection)-12/SC-28) at IL5 and above." }
+  ]
+},
+{
+  tag:"P7", title:"Operations, Troubleshooting & Efficiency",
+  sub:"The cross-cutting mastery that separates a button-clicker from an engineer: identity, storage, deployments, automation, cost.",
+  mods:[
+    { id:"7.1", rule:"Grant the least role at the smallest scope, and make admin rights temporary. Standing global-admin is the finding auditors love; PIM (just-in-time elevation) plus a break-glass account is the grown-up pattern.", name:"Identity done right (RBAC (Role-Based Access Control), PIM (Privileged Identity Management), break-glass)",
+      why:"Most breaches are identity breaches. You implement least privilege with Azure RBAC, just-in-time elevation with PIM, and a guarded emergency 'break-glass' account.",
+      steps:[
+        {t:"Assign roles at the narrowest scope that works; remove standing owner/admin rights."},
+        {t:"Enable PIM so privileged roles are activated on-demand, time-boxed, and logged."},
+        {t:"Create one tightly-monitored break-glass account excluded from Conditional Access, with the password split/sealed."}
+      ],
+      tshoot:["'Access denied' doing admin work → you may need to PIM-activate the role first; standing access was removed by design.","Locked out entirely → that's exactly what break-glass exists for; that's why you set it up before you need it."],
+      il6:"JIT privileged access + monitored break-glass is core AC-2/AC-6 and a headline item in the classified overlay." },
+    { id:"7.2", rule:"When storage access fails, check identity and network before the data. It is almost always a missing RBAC role or a private-endpoint/firewall rule, not the blob itself.", name:"Storage troubleshooting playbook (Azure side)",
+      why:"Storage problems span the OS (P3.5) and the cloud. Here you handle the Azure-side failures: throttling, quotas, tiers, and full disks.",
+      steps:[
+        {t:"Resize an OS/data disk in Azure, then extend it inside the OS (the cloud only grows the raw disk)."},
+        {t:"Understand blob access tiers (hot/cool/archive) and storage account throttling limits (IOPS/throughput caps)."}
+      ],
+      tshoot:["Deployment fails 'quota exceeded' → request a quota increase or pick a smaller SKU/region.","App slow under load → you may be hitting storage account throughput limits; spread across accounts or move to premium disks.","Disk grown but app still says full → extend partition + filesystem in the guest OS (loop back to P3.5/P4 skills)."],
+      il6:"Capacity and availability management touches CP (Contingency Planning) and AU (Audit and Accountability) controls — a full audit-log disk is a compliance incident, not just an outage." },
+    { id:"7.3", rule:"Always git pull --rebase before you push, and let the pipeline deploy, not your laptop. Rebasing keeps history clean and avoids merge-commit noise; deploying only through the pipeline means every change is reviewed and repeatable.", name:"Deployment & rollback playbook (CI/CD (Continuous Integration / Continuous Delivery))",
+      why:"You move from running Terraform by hand to a pipeline that plans on every change and applies on approval — auditable, repeatable deployments with a clean rollback path.",
+      steps:[
+        {t:"Put your Terraform in Git; add a GitHub Actions workflow that runs 'fmt/validate/plan' on PRs and 'apply' on merge (manual approval gate)."},
+        {t:"Practice a rollback: revert the commit, let the pipeline re-apply the previous known-good state."},
+        {t:"Level up to a BLUE-GREEN flip: your reusable modules (1.8) make a full clone one apply away. Stand up 'green' (the clone) next to 'blue' (live). Key concept: green is FULLY RUNNING before any traffic moves — built, booted, app up, health probes passing — it just has no visitors yet. Test it directly (via Bastion / its private IP) first."},
+        {t:"The flip turns nothing on — it only re-aims traffic. The backend pool is just the load balancer's 'list of tables to seat people at': change the list from blue's NICs (Network Interface Cards) to green's and apply. The public IP/DNS never changes; users hit the same front door and get quietly seated in the new room. In-flight connections drain; new requests land on green."},
+        {t:"Keep blue warm: if green misbehaves, rollback is one routing change back to blue — seconds, not a redeploy. Once green is proven, tear blue down to stop paying for two stacks. CANARY is the same idea with training wheels: shift only a slice of traffic (weighted routing on App Gateway / Front Door) to green first, watch the metrics, then go all-in."},
+        {code:"# pipeline core steps\nterraform fmt -check\nterraform validate\nterraform plan -out tfplan\n# (manual approval)\nterraform apply tfplan"}
+      ],
+      tshoot:["Pipeline can't authenticate to Azure → use a service principal / OIDC federated credential, never a checked-in secret.","Plan shows surprise changes → someone clicked in the portal (drift); reconcile before applying."],
+      il6:"A gated, logged pipeline is change control (CM (Configuration Management)-3) automated — every production change has an approver and an audit trail." },
+    { id:"7.4", rule:"Write the runbook the first time you do a task, not the tenth. If you had to figure it out, the next person will too — a short runbook turns a hero into a team.", name:"Efficiency: tagging, naming, modules, runbooks",
+      why:"Discipline scales. Consistent naming/tagging makes cost and ownership legible; reusable modules and written runbooks turn one-off fixes into repeatable procedures.",
+      steps:[
+        {t:"Adopt a naming standard (e.g. rg-/vnet-/vm- prefixes) and mandatory tags (env, owner, costcenter) via Azure Policy."},
+        {t:"Promote your best patterns into shared Terraform modules; write a short runbook for each common task (build, patch, rotate keys, tear down)."}
+      ],
+      tshoot:["Can't tell what a resource is for → that's the cost of skipping tags; backfill with Azure Policy 'append' rules."],
+      il6:"Documented, repeatable procedures are the difference between an auditable program and tribal knowledge — and they're explicitly required (CM (Configuration Management)/PL)." },
+    { id:"7.5", rule:"Destroy lab resources at the end of the day. The golden rule of cloud cost is that idle resources still bill — a nightly terraform destroy is cheaper than any 'oops' invoice.", name:"Cost optimization & teardown discipline",
+      why:"The cheapest resource is the one that's off. You make frugality a system, not a hope.",
+      steps:[
+        {t:"Auto-shutdown on every VM; deallocate when idle; delete Bastion/public IPs you're not using."},
+        {t:"Review Cost Management weekly; keep a 'terraform destroy' command ready for full teardown between study sessions."}
+      ],
+      tshoot:["Bill higher than expected with VMs (Virtual Machines) off → disks, Bastion, public IPs, Sentinel ingestion, and Defender plans all bill independently of VM run state."],
+      il6:"Cost-to-mission stewardship is real in gov programs; the same teardown discipline doubles as your disaster-recovery rehearsal." },
+    { id:"7.6", rule:"Assume identity is the new perimeter. MFA everywhere plus Conditional Access that checks device and location is the gate that actually stops attackers — password-only is indefensible now.", name:"MFA & Conditional Access — the Zero Trust gate",
+      why:"Passwords alone get stolen. MFA adds a second factor so a stolen password isn't enough. Conditional Access is the rules engine that decides who gets in and under what conditions — e.g., 'require MFA' and 'only from a compliant device.' Together they're the front line of the DoD (Department of Defense) Zero Trust push.",
+      steps:[
+        {t:"Turn on MFA — 'security defaults' is the free baseline; Conditional Access is the granular version."},
+        {t:"Build a Conditional Access policy: require MFA for admins, and require a compliant device (ties to Intune, module 5.3)."},
+        {t:"Keep your break-glass account (module 7.1) excluded so a policy mistake can't lock you out."},
+        {t:"Why + cost: stops most account-takeover for almost no effort. Basic MFA (security defaults) is free; Conditional Access needs an Entra ID P1/P2 license — use a free trial. Minutes to set up, huge risk reduction."}
+      ],
+      tshoot:["Locked yourself out → this is exactly what the excluded break-glass account is for.","Policy not applying → check the user/group assignment scope and that it's set to On, not Report-only."],
+      il6:"MFA + Conditional Access + device compliance is core Zero Trust and maps to IA (Identification and Authentication)-2 (multifactor) and AC (Access Control)-17; increasingly mandated across DoD." },
+    { id:"7.7", rule:"No human should know a privileged password. The mature pattern is: people request access, the vault hands out or injects the credential, rotates it on check-in, and records the session. If you can say 'nobody knows the root password and the vault rotates it automatically,' you sound like someone who has run real PAM.", name:"Privileged Access Management (PAM) with Delinea",
+      why:"Privileged accounts \u2014 local admin, root, domain admin, service accounts \u2014 are the keys to the kingdom, so mature organizations do not let people hold those passwords directly. A PAM (Privileged Access Management) platform like Delinea Secret Server keeps them in a vault, hands them out only when needed (often with approval), rotates them automatically, and records what was done with them. Azure gives you pieces of this \u2014 Entra PIM for just-in-time admin roles and Key Vault for app secrets \u2014 but in most enterprises and agencies a dedicated PAM tool sits on top of everything: Windows, Linux, network gear, databases, and cloud. With your security background, understanding PAM and being able to talk through Delinea is a real differentiator. (Heads-up: unless you have access to a Delinea instance at work or through a trial, treat this as concept and interview prep \u2014 say you understand PAM workflows, not that you have administered Delinea, unless you actually have.)",
+      steps:[
+        {t:"Hands-on stand-in: commercial PAM (Delinea/CyberArk) is not lab-affordable, but HashiCorp Vault (open source) lets you practice the same pattern for free — vault a credential, lease it out with a TTL (Time To Live), rotate it, and audit every access. Understand the pattern hands-on; name the enterprise products honestly as studied."},
+        {t:"Vault a credential: in Secret Server you create a Secret (for example a Linux root account, a Windows local admin, or a service account) and link it to the target system. The real password now lives in the vault, not in someone's notes."},
+        {t:"Check-out / check-in: when you need the password you check it out \u2014 Delinea logs who, when, and why, and can require approval first. When you check it back in, the vault can immediately rotate (change) the password so the one you saw is already dead."},
+        {t:"Automatic rotation (Remote Password Changing, RPC): point the Secret at the target so the vault changes the password on a schedule. Done right, no human ever knows the live password."},
+        {t:"Connect through a launcher / session proxy: instead of copying the password, you launch an RDP (Remote Desktop Protocol) or SSH (Secure Shell) session through Delinea \u2014 the credential is injected for you and the session can be recorded for audit."},
+        {t:"Access control + approval workflows: define which roles can request which Secrets, with time limits and approver sign-off \u2014 the privileged-access version of least privilege."},
+        {t:"How it relates to Azure: Entra PIM gives just-in-time elevation of Azure roles; Key Vault stores app secrets and certs. Delinea covers the broader fleet (Linux, Windows, network, databases) and adds session recording and approval flows the Azure-native tools do not fully provide. In interviews, position them as complementary, not competing."}
+      ],
+      tshoot:["Rotation (RPC) fails \u2014 the vault account usually lacks permission to change the target password, or a dependency (a Windows service or scheduled task still using the old password) breaks after the change; map dependencies before enabling auto-rotation.","Heartbeat shows the Secret as unreachable \u2014 Delinea cannot reach or authenticate to the target; check the network path, firewall/NSG (Network Security Group) rules, and that the stored credential is still valid.","Check-outs pile up waiting on approval \u2014 review the approval workflow and approver coverage; a PAM that blocks real work gets bypassed, which defeats the purpose."],
+      il6:"PAM is how you satisfy privileged-account and least-privilege controls at scale: AC (Access Control)-2 (account management), AC-6 and AC-6(5)/(9) (least privilege and privileged-account use and audit), AU (Audit and Accountability) for privileged-session monitoring, and IA (Identification and Authentication)-5 for credential rotation. In an RMF (Risk Management Framework) package, a tool like Delinea is often the evidence behind those controls." },
+    {"id": "7.8", "name": "CI/CD pipelines with GitHub Actions and Azure Pipelines", "rule": "Deploying from your laptop does not scale and leaves no trail. A pipeline that plans on every pull request and applies on approval is change control, automated, and it is named on almost every job posting.", "why": "Continuous Integration and Continuous Delivery (CI/CD) is the assembly line for your code and your infrastructure. Every change runs the same automated path: build, test, scan, and deploy, with a human approval gate before production. You will use GitHub Actions or Azure Pipelines, and authenticate to Azure with a federated OpenID Connect (OIDC) credential, so no secret password is ever stored in the pipeline.", "steps": [{"t": "Put your Terraform in a Git repository, then create a workflow that runs format, validate, and a plan automatically on every pull request."}, {"t": "Add an approval gate so the apply runs only after a human reviews the plan and merges to the main branch."}, {"t": "Wire in the IaC scanner from module 1.7 so security runs on every change, not occasionally."}, {"t": "Authenticate with OIDC federated credentials, so the pipeline receives a short-lived token instead of a stored secret, the no-stored-secrets pattern interviewers love."}, {"t": "Practice a rollback: revert the offending commit and let the pipeline redeploy the last good state."}, {"t": "Why plus cost: GitHub Actions and Azure Pipelines both have generous free tiers, and the audit trail plus approval gate is exactly the change-control evidence an assessor wants."}], "tshoot": ["Pipeline cannot log in to Azure, check the federated credential subject matches the repo and branch exactly; OIDC is strict about it.", "Plan succeeds but apply changes nothing, the pipeline is using a different state file than you expect; confirm the backend config."], "il6": "A gated, logged pipeline is automated configuration management and change control, every production change has an approver and an immutable audit trail, the heart of the CM family."},
+    {"id": "7.9", "name": "Python for automation and the Azure SDK", "rule": "When a task is too smart for a Bash one-liner and too imperative for Terraform, reach for Python. It is the glue language named on nearly every DevOps posting.", "why": "Terraform describes desired state and Bash handles quick local tasks, but a lot of real operations work — auditing resources, reacting to an event, calling several APIs in sequence — is cleanest in Python. With the Azure SDK for Python you authenticate once and then list, inspect, or change resources programmatically. You do not need to be a software engineer; you need clear, readable scripts you fully understand.", "steps": [{"t": "Install the Azure SDK for Python (the azure-identity and azure-mgmt packages) and authenticate with DefaultAzureCredential, which reuses your az login."}, {"t": "Write a script that lists every resource missing a required tag, a real governance task that proves immediate value."}, {"code": "from azure.identity import DefaultAzureCredential\nfrom azure.mgmt.resource import ResourceManagementClient\n# auth, then flag any resource missing an owner tag"}, {"t": "Extend it to act on what it finds, for example reporting idle public IP addresses you are paying for, or stopping VMs left running after hours."}, {"t": "Know when to use what: Terraform for desired state, Bash for quick local glue, Python for logic, loops, and multi-step API work."}, {"t": "Commit the script to your portfolio repo with a short README, and be ready to walk it line by line, understanding it matters more than writing it."}], "tshoot": ["Authentication fails, confirm az login works first; DefaultAzureCredential tries several methods and the error usually names which one failed.", "Listing everything is slow, filter by resource group or tag in the API call instead of pulling the whole subscription."], "il6": "Scripted, repeatable automation with a readable audit trail beats click-by-click admin work for both consistency and evidence, and keeps a human from fat-fingering a control."}
+  ]
+},
+{
+  tag:"P8", title:"Capstone — The ATO (Authorization to Operate) Simulation",
+  sub:"Prove it. Build the whole environment from one repo, assess it, document it like a real authorization package, then rebuild from scratch.",
+  mods:[
+    { id:"8.1", rule:"If you cannot build it from a single apply, it is not really infrastructure-as-code yet. The whole-environment-from-scratch test is the truest measure of whether you own your stack.", name:"Build the full environment from one apply",
+      why:"The real test of an IaC (Infrastructure as Code) engineer: one repository, one 'terraform apply', and the entire enterprise stands up — network, Linux web tier, AD (Active Directory), monitoring, the works.",
+      steps:[
+        {t:"Compose your modules into a single root configuration; run plan, then apply, and watch it all come up."},
+        {t:"Confirm services talk to each other (web → app, clients → DC (Domain Controller), logs → workspace)."}
+      ],
+      tshoot:["Dependency ordering errors → add explicit 'depends_on' where Terraform can't infer the order (e.g. DC before domain join)."],
+      il6:"Reproducible full-environment builds are the gold standard of CM (Configuration Management) and contingency planning." },
+    { id:"8.2", rule:"Run your scans against the freshly built environment, not the one you hand-fixed. A clean build re-exposes anything you only patched by hand — fix it in the code so it stays fixed.", name:"Assess: run all scans, capture posture",
+      why:"You assess the built system exactly as an assessor would: STIG (Security Technical Implementation Guide) scans on every host, Defender Secure Score, vulnerability results — captured as evidence.",
+      steps:[
+        {t:"Run OpenSCAP + Windows STIG scans, export Defender's compliance view, and run a vulnerability scan."},
+        {t:"Record your Secure Score and finding counts as your baseline metrics."}
+      ],
+      tshoot:["Findings differ from earlier modules → expected; a fresh full build re-exposes anything you fixed only by hand. Fix it in code."],
+      il6:"This is RMF (Risk Management Framework)'s Assess step end-to-end; your outputs are the assessment evidence." },
+    { id:"8.3", rule:"Document while it is fresh and be honest about gaps. A POA&M with real dates beats a perfect-looking SSP that hides risk — assessors trust honesty over polish.", name:"Document: mini SSP + POA&M (Plan of Action and Milestones)",
+      why:"Engineering without documentation doesn't get authorized. You write a lightweight System Security Plan describing how controls are met, and a POA&M listing open findings with remediation dates.",
+      steps:[
+        {t:"For a handful of key controls (AC (Access Control)-2, AU (Audit and Accountability)-6, SC (System and Communications Protection)-28, SI (System and Information Integrity)-2), write one paragraph each on how your lab implements it."},
+        {t:"List unresolved scan findings in a POA&M table: finding, risk, planned fix, target date."}
+      ],
+      tshoot:["Tempted to claim a control you didn't implement → don't; an honest POA&M is stronger than a fake compliant status."],
+      il6:"The SSP + POA&M are the literal deliverables that earn (or block) an ATO (Authorization to Operate)." },
+    { id:"8.4", rule:"Keep a current architecture diagram — a stale diagram is worse than none. In a real shop the diagram is the first thing anyone asks for in an incident or an audit.", name:"Diagram + control mapping",
+      why:"A clear architecture diagram and a control-to-implementation map make your system legible to anyone reviewing it — and force you to understand your own design.",
+      steps:[
+        {t:"Draw the network/identity/data-flow diagram (any tool)."},
+        {t:"Build a small table mapping each major component to the NIST (National Institute of Standards and Technology) control(s) it satisfies."}
+      ],
+      tshoot:["Diagram and reality drift → regenerate it from your Terraform whenever the design changes."],
+      il6:"Diagrams + control mappings are required ATO (Authorization to Operate) artifacts and the first thing an assessor reads." },
+    { id:"8.5", rule:"Rebuild-from-code is your disaster-recovery proof. If you can destroy and recreate the whole environment on demand, you have already passed half of any DR conversation.", name:"Destroy and rebuild from code",
+      why:"The final proof: tear the whole thing down and rebuild it identically from the repo. If you can do this on demand, you've internalized everything — reproducibility, recovery, and cost discipline in one move.",
+      steps:[
+        {code:"terraform destroy           # tear it all down (saves money)\n# ...later...\nterraform apply             # rebuild the entire environment from code"},
+        {t:"Time yourself. A clean rebuild from code is your disaster-recovery story and your interview party trick."}
+      ],
+      tshoot:["Rebuild isn't identical → something was created by hand and not captured in code; find it and codify it. That gap is the lesson."],
+      il6:"Rebuild-from-code is the ultimate contingency/recovery evidence (CP (Contingency Planning) family) — and the moment you can call yourself a proficient ISSE (Information Systems Security Engineer)." }
+  ]
+},
+{
+  tag:"P9", title:"Market Add-Ons — Cloud Engineer Consensus",
+  sub:"The most-requested skills across 2026 cloud-engineer postings that this lab's core build doesn't already cover. Bolt these on to be competitive for the broader cloud market, not just the gov niche.",
+  mods:[
+    { id:"9.1", rule:"Do not run as root in the cluster, and set resource limits on every pod. Containers without limits can starve a node — this detail separates 'deployed it once' from 'ran it in production'.", name:"Kubernetes (AKS (Azure Kubernetes Service)) — container orchestration",
+      tieLabel:"Market signal",
+      why:"Containers were step one (Phase 4); orchestration is what enterprises actually run. Kubernetes is the default runtime for modern apps and the single biggest skill your lab is missing versus the market. You already containerized an app — now run it at scale with self-healing and rolling updates.",
+      steps:[
+        {t:"Deploy a managed cluster with Terraform (AKS), or run kind/minikube locally for free while you learn."},
+        {t:"Learn the core objects: Pod, Deployment, Service, Namespace, ConfigMap, Secret."},
+        {t:"Deploy your container as a Deployment, expose it with a Service, scale it, then do a rolling update and a rollback."},
+        {code:"kubectl get nodes\nkubectl apply -f deployment.yaml\nkubectl get pods -w\nkubectl scale deployment/web --replicas=3\nkubectl rollout undo deployment/web   # rollback"}
+      ],
+      tshoot:["Pod stuck in CrashLoopBackOff → 'kubectl logs <pod>' and 'kubectl describe pod <pod>' tell you exactly why.","ImagePullBackOff → wrong image tag or registry auth; check the image name and your pull secret.","Cluster bill climbing → the control plane + node VMs (Virtual Machines) bill hourly; scale nodes to zero or learn free on local kind."],
+      il6:"Kubernetes (~16k postings) tops the DevOps/infra skills list and underpins the CKA cert — the highest-impact single add for cloud-engineer competitiveness." },
+    { id:"9.2", rule:"Build small, pinned images and never bake secrets into them. Use specific base-image tags (not latest) and multi-stage builds — a huge image with a password in a layer is an interview-ender.", name:"Docker fluency — images & registries",
+      tieLabel:"Market signal",
+      why:"Postings say 'Docker' by name. Podman (Phase 4) is command-compatible, so this is mostly vocabulary plus the build/tag/push workflow that feeds Kubernetes. The image is the unit of deployment.",
+      steps:[
+        {t:"Write a Dockerfile, build an image, and push it to a registry (Azure Container Registry or Docker Hub)."},
+        {t:"Use a slim, hardened base image and multi-stage builds — smaller images are faster and have less attack surface."},
+        {code:"docker build -t myapp:1.0 .        # podman uses identical syntax\naz acr login --name <registry>\ndocker push <registry>.azurecr.io/myapp:1.0"}
+      ],
+      tshoot:["Image huge/slow → switch to a slim base and multi-stage build.","Push denied → run 'az acr login' / 'docker login' first; check repo permissions."],
+      il6:"Docker (~14k postings) appears in nearly every DevOps/platform role and is the on-ramp to Kubernetes." },
+    { id:"9.3", rule:"Speak in concepts, map to names: VPC equals VNet, IAM equals Entra, S3 equals Blob. Fluent translation is worth more than shallow depth in a second cloud.", name:"Cross-cloud exposure — a slice of AWS",
+      tieLabel:"Market signal",
+      why:"For the generic cloud-engineer market, AWS leads by hiring volume — it nearly doubles Azure in postings. Your gov/IL6 (Impact Level 6) path is rightly Azure-first (Azure Government dominates classified work), but being able to say 'AWS + Azure' widens your options, and multi-cloud is increasingly expected.",
+      steps:[
+        {t:"Mirror a tiny slice in AWS with Terraform: a VPC, an EC2 instance, an S3 bucket, and an IAM role."},
+        {t:"Map the concepts you already know: VNet (Virtual Network)≈VPC, NSG (Network Security Group)≈Security Group, Blob≈S3, Entra/RBAC (Role-Based Access Control)≈IAM."},
+        {t:"Keep it minimal and tear it down — AWS free tier covers most of this."}
+      ],
+      tshoot:["Set an AWS Billing budget/alert FIRST — same discipline as Azure; idle Elastic IPs and NAT gateways quietly cost money."],
+      il6:"AWS (~50k postings, ~33% market share) is the #1 platform by hiring volume; AWS Solutions Architect Associate is the market's workhorse cert. Azure stays your primary for government work." },
+    { id:"9.4", rule:"Alert on symptoms users feel, not every metric. A dashboard nobody reads and alerts that cry wolf are noise — pick a few meaningful signals (latency, errors, saturation).", name:"Observability — Prometheus + Grafana",
+      tieLabel:"Market signal",
+      why:"Building it isn't enough; employers want you to see it. Monitoring/observability is a standard posting line item, and Prometheus + Grafana is the free, vendor-neutral combo that travels across every cloud and on-prem.",
+      steps:[
+        {t:"Deploy Prometheus to scrape metrics and Grafana to dashboard them (on a VM (Virtual Machine) or inside your AKS (Azure Kubernetes Service) cluster)."},
+        {t:"Build a dashboard for CPU/memory/request rate and add one alert rule."},
+        {t:"Tie it back to your Phase 6 logging: logs + metrics together = observability."}
+      ],
+      tshoot:["No data in Grafana → check the Prometheus data source URL and confirm targets show 'UP' on Prometheus' /targets page."],
+      il6:"Monitoring/observability (Grafana, Prometheus, CloudWatch, Datadog) recurs across DevOps/SRE postings; Grafana is the most portable dashboarding skill." },
+    { id:"9.5", rule:"Certs get you past the resume filter; the lab gets you through the interview. Put a real exam date on the calendar — an open-ended 'studying' never converts.", name:"Certification pathway — clear the resume filter",
+      tieLabel:"Market signal",
+      why:"The consistent market finding: certs get your resume past the automated screen, projects get you through the technical interview. You're building the projects — pair them with one or two high-ROI certs and you clear both gates.",
+      steps:[
+        {t:"Start cheap and aligned: HashiCorp Terraform Associate (low cost, high ROI, you already use Terraform)."},
+        {t:"Add a platform associate: Azure Administrator (AZ-104) for your gov path, or AWS Solutions Architect Associate for the broader market."},
+        {t:"After module 9.1, target the CKA (Certified Kubernetes Administrator)."},
+        {t:"Optional foundational: AZ-900 / AWS Cloud Practitioner — validates basics, not a hiring cert on its own."}
+      ],
+      tshoot:["Don't collect badges with nothing behind them — a cert with no project loses to a project with no cert. Do both, and lead with the repo."],
+      il6:"AWS Solutions Architect Associate, Azure Administrator, Terraform Associate, and CKA are the certs that recur most across 2026 cloud postings and salary reports." },
+    {"id": "9.6", "name": "GitOps on AKS with Flux v2", "rule": "GitOps flips deployment around: instead of your pipeline pushing to the cluster, the cluster pulls from Git and corrects any drift. Git becomes the single source of truth, and a rollback is just a git revert.", "why": "In a push pipeline, your CI/CD tool holds cluster credentials and runs commands against the cluster, a big attack surface, and any manual change quietly drifts from what you deployed. GitOps inverts that: a controller inside the cluster watches a Git repository and continuously reconciles the live state to match it. On Azure you enable this with Microsoft's managed Flux v2 cluster extension, so the cluster pulls its own desired state and self-heals back to Git whenever someone changes something by hand.", "steps": [{"t": "Enable the GitOps extension on your AKS cluster (the microsoft.flux extension) using the Azure CLI k8s-extension command."}, {"t": "Point a flux configuration at a Git repository holding your Kubernetes manifests, organized with Kustomize or Helm."}, {"t": "Change a manifest in Git, say bump the replica count, push it, and watch Flux reconcile the cluster to match within minutes, with no kubectl on your part."}, {"t": "Make a manual change with kubectl and watch Flux detect the drift and revert the cluster back to what Git says, that self-healing is the whole point."}, {"t": "Practice the rollback that wins interviews: git revert the bad commit, push, and Flux returns the cluster to the previous good state."}, {"t": "Never store secrets in Git in plain text; use Azure Key Vault with the Secrets Store driver, or encrypted secrets, so the source of truth stays safe."}], "tshoot": ["Flux is not applying changes, check the flux configuration sync status in the portal or CLI; a bad repo path or auth is the usual cause.", "Cluster keeps reverting your hotfix, that is GitOps working as designed; make the change in Git, not on the cluster."], "il6": "Git as the source of truth gives an immutable, reviewable history of every cluster change plus automatic drift correction, strong evidence for configuration management and integrity controls."},
+    {"id": "9.7", "name": "Kubernetes autoscaling in depth — HPA, Cluster Autoscaler, KEDA", "rule": "Set resource requests and limits first, every autoscaler depends on them. Then scale at three levels: pods, nodes, and events. Scaling on real demand is what separates a production cluster from a demo.", "why": "Scaling a cluster happens at three layers. The Horizontal Pod Autoscaler (HPA) adds or removes pod copies based on CPU, memory, or custom metrics. The Cluster Autoscaler (or node autoprovisioning) adds or removes worker nodes when pods cannot be scheduled or sit idle. And KEDA, the Kubernetes Event-Driven Autoscaler, scales on external signals like a queue depth or request rate, and can even scale to zero when there is no work. All three rest on accurate resource requests, so that is where you start.", "steps": [{"t": "Set realistic CPU and memory requests and limits on your deployment; without them, every autoscaler is guessing."}, {"t": "Add a Horizontal Pod Autoscaler targeting about seventy percent CPU, then load-test the app and watch pods multiply and later settle back down."}, {"t": "Enable the Cluster Autoscaler on your node pool and push enough load that pods cannot fit, then watch Azure add a node and later remove it when idle."}, {"t": "Turn on the KEDA add-on and scale a worker on an external trigger, for example the number of messages in an Azure Service Bus queue, including scaling to zero when the queue is empty."}, {"t": "Why plus cost: scaling on real demand means you pay for capacity only when it is needed, and scale-to-zero means idle workloads cost nothing, the single biggest Kubernetes cost lever."}], "tshoot": ["HPA shows unknown metrics, the metrics server or the resource requests are missing; fix requests first.", "Pods are pending but no node is added, the Cluster Autoscaler is off, at its max, or the node pool VM size cannot fit the pod's requests."], "il6": "Demand-based autoscaling supports availability and capacity-planning requirements while controlling cost, proving a system meets load without permanent over-provisioning."}
+  ]
+},
+{
+  tag:"P10", title:"Resilience & Response",
+  sub:"Detection without a recovery and response plan is half a security program. Add the ability to get your data back and to handle an incident calmly — the domains interviewers probe hardest.",
+  mods:[
+    { id:"10.1", rule:"A backup you have never restored is a hope, not a backup. Test a restore on a schedule, protect stateful data, and rebuild stateless servers from code to save money.", name:"Backup & Disaster Recovery",
+      why:"Your 'rebuild from Terraform' story recovers the infrastructure, but not your data. Real recovery means backing up what matters (like the domain controller), knowing your RTO (Recovery Time Objective)/RPO (how fast you recover, how much data you can lose), and — the step everyone skips — actually testing a restore.",
+      steps:[
+        {t:"Create a Recovery Services Vault and enable Azure Backup for the domain controller and any data you care about."},
+        {t:"Take a managed-disk SNAPSHOT before any risky change — then actually PRACTICE the rollback: make a breaking change, create a disk from the snapshot, swap it in as the VM's OS disk, boot, and confirm you're back to the pre-change state."},
+        {t:"Know the three recovery tiers and when to reach for each: SNAPSHOT = instant point-in-time rollback for 'right before I touch this' moments; AZURE BACKUP = scheduled, retained protection for stateful data (the DC, databases); TERRAFORM REBUILD = stateless servers, where re-applying code is faster and cheaper than restoring anything."},
+        {t:"Write down RTO/RPO targets, then prove them: delete something and restore it."},
+        {t:"Why + cost: a backup you've never restored is a hope, not a backup. Azure Backup bills per protected instance + storage — in the lab, protect only the DC (Domain Controller)/data and let stateless servers rebuild from code to save money."}
+      ],
+      tshoot:["Restore test fails → that's the whole point of testing; fix it now, not during a real outage.","Backup costs creeping up → you're protecting too much; back up data, rebuild stateless infrastructure from Terraform."],
+      il6:"Backup + tested restore + RTO/RPO is the Contingency Planning (CP) family — a required, audited part of every ATO (Authorization to Operate)." },
+    { id:"10.2", rule:"Write the incident runbook before the incident and rehearse it. A tabletop on a calm afternoon is how teams stay calm at 2am — know who decides, who communicates, who fixes.", name:"Incident Response runbook + tabletop",
+      why:"When an alert fires, panic is expensive. A runbook turns an incident into a checklist: Prepare, Detect & Analyze, Contain, Eradicate, Recover, Lessons Learned. You write it once and rehearse it with a tabletop so it becomes muscle memory.",
+      steps:[
+        {t:"Write a one-page IR runbook following the NIST (National Institute of Standards and Technology) 800-61 lifecycle (see resilience-and-response.md)."},
+        {t:"Run a tabletop on a real scenario — a compromised client or a data spill — and walk every phase out loud."},
+        {t:"Practice the technical moves: isolate a host (NSG (Network Security Group) / disable NIC), disable a user account, pull logs from Sentinel, restore from backup."},
+        {t:"Why + cost: free — it's process and practice. An afternoon that pays off enormously when something real happens; rehearsed teams contain incidents faster and limit damage."}
+      ],
+      tshoot:["No clear 'who to call' → the runbook lists roles and decision points; in the lab, list the steps and the call you'd make at each.","Tabletop reveals a gap (no backup, no logging) → that's a finding; fix it and add it to your POA&M (Plan of Action and Milestones)."],
+      il6:"A documented, exercised IR plan is the Incident Response (IR) family and a headline ATO (Authorization to Operate) requirement; tabletop exercises are explicitly expected." },
+    {"id": "10.3", "name": "Sentinel SOC capstone — map your lab and watch who's knocking", "rule": "You built it; now defend it. A SIEM (Security Information and Event Management) with no one looking at it is a very expensive log bucket — the skill is turning raw events into a map, a detection, an incident, and an automated response.", "why": "This is where you flip from builder to defender. First you draw your infrastructure: Network Watcher TOPOLOGY renders your VNets/subnets/NICs as a diagram, and VM insights MAP shows live processes and connections between your machines. Then Microsoft Sentinel shows you the attacker's view: connect your sign-in, syslog, and firewall logs, and within minutes you will see the internet's background radiation — bots probing your front door from around the world — rendered on a geographic map. Then you detect it, investigate it, and auto-respond to it: the full SOC (Security Operations Center) loop, on infrastructure you built yourself.", "steps": [{"t": "Map the infrastructure first: open Network Watcher > Topology for the wiring diagram of your VNets, subnets, and NICs (Network Interface Cards), and enable VM insights to get the Map view — live processes and machine-to-machine connections. That is your 'map of our stuff'."}, {"t": "Connect the data: in Sentinel, add the Azure Activity, Microsoft Entra ID sign-in, Syslog (Linux auth via the Azure Monitor Agent), Windows Security Events, and Azure Firewall/NSG flow log connectors."}, {"t": "Watch the front door: query failed logins with KQL (Kusto Query Language) and enrich source IPs with geo_info_from_ip_address(), then render it on a workbook MAP visualization — every red dot is a real probe attempt against your lab."}, {"code": "Syslog\n| where Facility == \"auth\" and SyslogMessage has \"Failed password\"\n| extend ip = extract(@\"from ([\\d\\.]+)\", 1, SyslogMessage)\n| extend geo = geo_info_from_ip_address(ip)\n| summarize attempts = count() by ip, tostring(geo.country)\n| order by attempts desc"}, {"t": "Detect: create a scheduled analytics rule — e.g. 10+ failed logins from one IP in 5 minutes = brute force — and let it open an INCIDENT. Open the incident's INVESTIGATION GRAPH: a visual map of the attack's entities (IP -> account -> machine) and how they connect."}, {"t": "Respond automatically (SOAR — Security Orchestration, Automation and Response): attach a Logic App playbook that posts the alert to email/Teams — or goes further and adds a deny rule for the attacker's IP to your NSG. Detection to containment with no human in the loop."}, {"t": "Hunt: run Sentinel's built-in hunting queries, mapped to MITRE ATT&CK tactics, against your own logs — this is the proactive half of SOC work and a great interview topic."}, {"t": "Cost/teardown: Sentinel has a 31-day free trial with a generous daily allowance, and lab log volume is tiny — but set a DAILY CAP on the Log Analytics workspace, disconnect noisy connectors when done, and remove Sentinel from the workspace at teardown."}], "tshoot": ["No Linux auth events arriving — the Azure Monitor Agent needs a Data Collection Rule that actually includes the auth/authpriv syslog facilities; that omission is the number-one cause.", "Map shows nothing — geo_info_from_ip_address() needs public source IPs; if everything comes through Bastion you will only see private addresses, which is itself proof your hardening works (probe your firewall's public IP logs instead).", "Analytics rule never fires — check the rule's query window and frequency against when the events actually landed; clock windows are the usual culprit."], "il6": "This is continuous monitoring (the M in RMF) made tangible: centralized audit collection (AU family), automated detection and incident handling (IR family), and evidence you can replay. Walking an assessor through your investigation graph and playbook is exactly what 'we monitor continuously' is supposed to mean."}
+  ]
+}
+];
+
+/* ----------------------------- STATE / STORAGE ----------------------------- */
+const KEY = "isse-lab-progress-v1";
+let done = {};            // { "0.1": true, ... }
+let mem = {};             // in-memory fallback
+const hasStore = (typeof window !== "undefined" && window.storage);
+
+async function loadProgress(){
+  if(hasStore){
+    try{ const r = await window.storage.get(KEY); if(r && r.value) done = JSON.parse(r.value); }
+    catch(e){ done = {}; }
+  } else { done = mem; }
+}
+async function saveProgress(){
+  const note = document.getElementById("saveNote");
+  if(hasStore){
+    try{ await window.storage.set(KEY, JSON.stringify(done)); flash(note,"✓ progress saved"); }
+    catch(e){ flash(note,"⚠ could not save"); }
+  } else { mem = done; flash(note,"✓ saved (session)"); }
+}
+let flashT;
+function flash(el,msg){ if(!el) return; el.textContent=msg; clearTimeout(flashT); flashT=setTimeout(()=>el.textContent="",1600); }
+
+/* ----------------------------- RENDER ----------------------------- */
+const totalMods = PHASES.reduce((n,p)=>n+p.mods.length,0);
+
+function el(tag,cls,txt){ const e=document.createElement(tag); if(cls)e.className=cls; if(txt!=null)e.textContent=txt; return e; }
+
+const VIZ = {
+"0.4":{cap:"How Azure nests things: Tenant → Management Group → Subscription → Resource Group → resources. Delete the resource group and everything inside it is gone (your cost safety net).",svg:`<svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace">
+<rect x="20" y="16" width="320" height="36" rx="8" fill="#0e1626" stroke="#58a6ff"/><text x="34" y="39" fill="#f4f7fb" font-size="12.5">Tenant - Microsoft Entra ID</text>
+<line x1="40" y1="52" x2="40" y2="82" stroke="#2e3947"/><line x1="40" y1="82" x2="56" y2="82" stroke="#2e3947"/>
+<rect x="56" y="64" width="320" height="36" rx="8" fill="#0e1626" stroke="#2a3a4d"/><text x="70" y="87" fill="#f4f7fb" font-size="12.5">Management Group</text>
+<line x1="76" y1="100" x2="76" y2="130" stroke="#2e3947"/><line x1="76" y1="130" x2="92" y2="130" stroke="#2e3947"/>
+<rect x="92" y="112" width="320" height="36" rx="8" fill="#0e1626" stroke="#2a3a4d"/><text x="106" y="135" fill="#f4f7fb" font-size="12.5">Subscription - Pay-As-You-Go</text>
+<line x1="112" y1="148" x2="112" y2="178" stroke="#2e3947"/><line x1="112" y1="178" x2="128" y2="178" stroke="#2e3947"/>
+<rect x="128" y="160" width="320" height="36" rx="8" fill="#0e1626" stroke="#56d4dd"/><text x="142" y="183" fill="#f4f7fb" font-size="12.5">Resource Group - rg-lab-core</text>
+<line x1="148" y1="196" x2="148" y2="224" stroke="#2e3947"/>
+<rect x="148" y="222" width="104" height="34" rx="7" fill="#10202f" stroke="#2a3a4d"/><text x="200" y="244" fill="#dbe2ea" font-size="11" text-anchor="middle">VNet</text>
+<rect x="262" y="222" width="104" height="34" rx="7" fill="#10202f" stroke="#2a3a4d"/><text x="314" y="244" fill="#dbe2ea" font-size="11" text-anchor="middle">Linux VM</text>
+<rect x="376" y="222" width="104" height="34" rx="7" fill="#10202f" stroke="#2a3a4d"/><text x="428" y="244" fill="#dbe2ea" font-size="11" text-anchor="middle">Key Vault</text>
+<rect x="490" y="222" width="104" height="34" rx="7" fill="#10202f" stroke="#2a3a4d"/><text x="542" y="244" fill="#dbe2ea" font-size="11" text-anchor="middle">Storage</text>
+</svg>`},
+"4.2":{cap:"Mock scan output - getenforce shows Enforcing; an OpenSCAP STIG run lists pass/fail per rule. Fix a denial with the right context, never by turning SELinux off.",svg:`<svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace">
+<rect x="1" y="1" width="638" height="248" rx="8" fill="#0a0d11" stroke="#2a3039"/><rect x="1" y="1" width="638" height="26" rx="8" fill="#13161b"/>
+<circle cx="18" cy="14" r="5" fill="#ff6b66"/><circle cx="36" cy="14" r="5" fill="#e3b341"/><circle cx="54" cy="14" r="5" fill="#58a6ff"/>
+<text x="320" y="18" fill="#5d6772" font-size="11" text-anchor="middle">bash - openscap / selinux</text>
+<text x="16" y="50" font-size="12.5" fill="#e7eef6">$ getenforce</text>
+<text x="16" y="70" font-size="12.5" fill="#56d4dd">Enforcing</text>
+<text x="16" y="94" font-size="12.5" fill="#e7eef6">$ <tspan fill="#58a6ff">oscap xccdf eval --profile stig rhel.xml</tspan></text>
+<text x="16" y="118" font-size="12" fill="#9aa6b4">Ensure SSHD PermitRootLogin disabled .......... <tspan fill="#56d4dd">pass</tspan></text>
+<text x="16" y="140" font-size="12" fill="#9aa6b4">Ensure auditd service is enabled .............. <tspan fill="#56d4dd">pass</tspan></text>
+<text x="16" y="162" font-size="12" fill="#9aa6b4">Ensure FIPS mode is enabled ................... <tspan fill="#ff6b66">fail</tspan></text>
+<text x="16" y="186" font-size="12.5" fill="#e7eef6">Score: <tspan fill="#56d4dd">87.4%</tspan>   (remediate fails, then re-scan)</text>
+<text x="16" y="214" font-size="11.5" fill="#5d6772">denial? -> ausearch -m avc -ts recent, then restorecon / semanage</text>
+</svg>`},
+"3.3":{cap:"Mock AD structure - the domain holds Organizational Units (OUs). You link GPOs to OUs, so design them around what you manage, not the org chart.",svg:`<svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace">
+<rect x="230" y="16" width="180" height="36" rx="8" fill="#0e1626" stroke="#58a6ff"/><text x="320" y="39" fill="#f4f7fb" font-size="12.5" text-anchor="middle">corp.lab (Domain)</text>
+<line x1="320" y1="52" x2="320" y2="78" stroke="#2e3947"/><line x1="84" y1="78" x2="556" y2="78" stroke="#2e3947"/>
+<line x1="84" y1="78" x2="84" y2="104" stroke="#2e3947"/><line x1="241" y1="78" x2="241" y2="104" stroke="#2e3947"/><line x1="399" y1="78" x2="399" y2="104" stroke="#2e3947"/><line x1="556" y1="78" x2="556" y2="104" stroke="#2e3947"/>
+<rect x="14" y="104" width="140" height="44" rx="8" fill="#0e1626" stroke="#56d4dd"/><text x="84" y="125" fill="#f4f7fb" font-size="11" text-anchor="middle">OU: Workstations</text><text x="84" y="140" fill="#58a6ff" font-size="9.5" text-anchor="middle">GPO: STIG-Win11</text>
+<rect x="171" y="104" width="140" height="44" rx="8" fill="#0e1626" stroke="#56d4dd"/><text x="241" y="125" fill="#f4f7fb" font-size="11" text-anchor="middle">OU: Servers</text><text x="241" y="140" fill="#58a6ff" font-size="9.5" text-anchor="middle">GPO: STIG-Srv</text>
+<rect x="329" y="104" width="140" height="44" rx="8" fill="#0e1626" stroke="#2a3a4d"/><text x="399" y="130" fill="#f4f7fb" font-size="11" text-anchor="middle">OU: Users</text>
+<rect x="486" y="104" width="140" height="44" rx="8" fill="#0e1626" stroke="#2a3a4d"/><text x="556" y="125" fill="#f4f7fb" font-size="11" text-anchor="middle">OU: Service</text><text x="556" y="140" fill="#dbe2ea" font-size="11" text-anchor="middle">Accounts</text>
+<text x="320" y="190" fill="#5d6772" font-size="10.5" text-anchor="middle">test a hardening GPO on a pilot OU before scoping it domain-wide</text>
+</svg>`},
+"6.2":{cap:"Mock Sentinel Logs view - a KQL query on top, a results grid below. Same idea as a Splunk search, different syntax.",svg:`<svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace">
+<rect x="0" y="0" width="640" height="58" fill="#0e1626"/>
+<text x="14" y="22" fill="#56d4dd" font-size="11">// Microsoft Sentinel - Logs (KQL)</text>
+<text x="14" y="44" fill="#f4f7fb" font-size="11.5">SecurityEvent | where Level == "Error" | project TimeGenerated, Computer, Activity</text>
+<text x="14" y="80" fill="#9aa6b4" font-size="11">TimeGenerated</text><text x="190" y="80" fill="#9aa6b4" font-size="11">Computer</text><text x="330" y="80" fill="#9aa6b4" font-size="11">Activity</text><text x="560" y="80" fill="#9aa6b4" font-size="11">Level</text>
+<line x1="14" y1="88" x2="626" y2="88" stroke="#20252c"/>
+<rect x="8" y="98" width="624" height="26" fill="#0f141b"/>
+<text x="14" y="116" fill="#e7eef6" font-size="11">2026-06-09 08:14</text><text x="190" y="116" fill="#e7eef6" font-size="11">web-vm-01</text><text x="330" y="116" fill="#e7eef6" font-size="11">Failed logon (4625)</text><text x="560" y="116" fill="#ff6b66" font-size="11">Error</text>
+<text x="14" y="146" fill="#e7eef6" font-size="11">2026-06-09 08:13</text><text x="190" y="146" fill="#e7eef6" font-size="11">web-vm-01</text><text x="330" y="146" fill="#e7eef6" font-size="11">Account lockout</text><text x="560" y="146" fill="#e3b341" font-size="11">Warn</text>
+<rect x="8" y="156" width="624" height="26" fill="#0f141b"/>
+<text x="14" y="174" fill="#e7eef6" font-size="11">2026-06-09 08:02</text><text x="190" y="174" fill="#e7eef6" font-size="11">dc-01</text><text x="330" y="174" fill="#e7eef6" font-size="11">Audit policy changed</text><text x="560" y="174" fill="#56d4dd" font-size="11">Info</text>
+<text x="14" y="212" fill="#5d6772" font-size="10.5">centralize logs before you need them - if it is not in the workspace, it did not happen</text>
+</svg>`},
+"9.1":{cap:"Mock AKS layout - a load balancer fronts the cluster; your containers run as pods scheduled across the nodes.",svg:`<svg viewBox="0 0 640 290" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace">
+<defs><marker id="ak" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#58a6ff"/></marker></defs>
+<rect x="250" y="12" width="140" height="32" rx="8" fill="#10202f" stroke="#2a4a66"/><text x="320" y="33" fill="#dbe2ea" font-size="11.5" text-anchor="middle">Internet</text>
+<line x1="320" y1="44" x2="320" y2="64" stroke="#58a6ff" marker-end="url(#ak)"/>
+<rect x="220" y="64" width="200" height="34" rx="8" fill="#0e1626" stroke="#58a6ff"/><text x="320" y="86" fill="#f4f7fb" font-size="11.5" text-anchor="middle">Service - LoadBalancer</text>
+<line x1="320" y1="98" x2="320" y2="116" stroke="#58a6ff" marker-end="url(#ak)"/>
+<rect x="20" y="116" width="600" height="158" rx="10" fill="#0c121d" stroke="#56d4dd"/><text x="36" y="136" fill="#56d4dd" font-size="11.5">AKS Cluster</text>
+<rect x="40" y="146" width="270" height="116" rx="9" fill="#0e1626" stroke="#2a3a4d"/><text x="56" y="166" fill="#dbe2ea" font-size="11">Node 1</text>
+<rect x="58" y="176" width="110" height="34" rx="7" fill="#10202f" stroke="#2a4a66"/><text x="113" y="198" fill="#e7eef6" font-size="10.5" text-anchor="middle">pod: web-1</text>
+<rect x="180" y="176" width="110" height="34" rx="7" fill="#10202f" stroke="#2a4a66"/><text x="235" y="198" fill="#e7eef6" font-size="10.5" text-anchor="middle">pod: web-2</text>
+<rect x="58" y="218" width="232" height="32" rx="7" fill="#10202f" stroke="#2a4a66"/><text x="174" y="239" fill="#e7eef6" font-size="10.5" text-anchor="middle">pod: api-1</text>
+<rect x="330" y="146" width="270" height="116" rx="9" fill="#0e1626" stroke="#2a3a4d"/><text x="346" y="166" fill="#dbe2ea" font-size="11">Node 2</text>
+<rect x="348" y="176" width="110" height="34" rx="7" fill="#10202f" stroke="#2a4a66"/><text x="403" y="198" fill="#e7eef6" font-size="10.5" text-anchor="middle">pod: api-2</text>
+<rect x="470" y="176" width="110" height="34" rx="7" fill="#10202f" stroke="#2a4a66"/><text x="525" y="198" fill="#e7eef6" font-size="10.5" text-anchor="middle">pod: web-3</text>
+<rect x="348" y="218" width="232" height="32" rx="7" fill="#10202f" stroke="#2a4a66"/><text x="464" y="239" fill="#e7eef6" font-size="10.5" text-anchor="middle">pod: worker-1</text>
+</svg>`},
+"1.2":{cap:"Mock terminal — what terraform plan shows before you apply. Green + means a resource will be created; always read this like a receipt.",
+svg:`<svg viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace">
+<rect x="1" y="1" width="638" height="238" rx="8" fill="#0a0d11" stroke="#2a3039"/>
+<rect x="1" y="1" width="638" height="26" rx="8" fill="#13161b"/>
+<circle cx="18" cy="14" r="5" fill="#ff6b66"/><circle cx="36" cy="14" r="5" fill="#e3b341"/><circle cx="54" cy="14" r="5" fill="#56d4dd"/>
+<text x="320" y="18" fill="#5d6772" font-size="11" text-anchor="middle">bash — terraform</text>
+<text x="16" y="52" font-size="12.5" fill="#d3e3f0">$ <tspan fill="#58a6ff">terraform plan</tspan></text>
+<text x="16" y="74" font-size="12.5" fill="#9aa6b4">Terraform will perform the following actions:</text>
+<text x="16" y="96" font-size="12.5" fill="#5d6772">  # azurerm_resource_group.core will be created</text>
+<text x="16" y="118" font-size="12.5" fill="#56d4dd">  + resource "azurerm_resource_group" "core" {</text>
+<text x="34" y="140" font-size="12.5" fill="#56d4dd">+ <tspan fill="#d3e3f0">location = "eastus"</tspan></text>
+<text x="34" y="162" font-size="12.5" fill="#56d4dd">+ <tspan fill="#d3e3f0">name     = "rg-lab-core"</tspan></text>
+<text x="16" y="184" font-size="12.5" fill="#56d4dd">    }</text>
+<text x="16" y="212" font-size="12.5" fill="#d3e3f0">Plan: <tspan fill="#56d4dd">1 to add</tspan>, 0 to change, 0 to destroy.</text>
+</svg>`},
+"2.1":{cap:"Architecture sketch — hub-and-spoke: each spoke VNet peers to a central hub, and all outbound traffic is forced through Azure Firewall.",
+svg:`<svg viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace">
+<defs><marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#58a6ff"/></marker></defs>
+<rect x="262" y="14" width="116" height="34" rx="8" fill="#10202f" stroke="#2a4a66"/>
+<text x="320" y="35" fill="#9aa6b4" font-size="13" text-anchor="middle">Internet</text>
+<rect x="198" y="118" width="244" height="120" rx="10" fill="#0e1626" stroke="#58a6ff"/>
+<text x="320" y="138" fill="#58a6ff" font-size="12" text-anchor="middle">Hub VNet  10.0.0.0/16</text>
+<rect x="216" y="152" width="96" height="40" rx="7" fill="#10202f" stroke="#2a4a66"/>
+<text x="264" y="176" fill="#e6edf3" font-size="11" text-anchor="middle">Azure Firewall</text>
+<rect x="328" y="152" width="96" height="40" rx="7" fill="#10202f" stroke="#2a4a66"/>
+<text x="376" y="176" fill="#e6edf3" font-size="11" text-anchor="middle">Bastion</text>
+<rect x="22" y="150" width="150" height="92" rx="10" fill="#0e1626" stroke="#56d4dd"/>
+<text x="97" y="170" fill="#56d4dd" font-size="11" text-anchor="middle">Spoke 1 · Web</text>
+<rect x="38" y="184" width="118" height="42" rx="7" fill="#10202f" stroke="#2a4a66"/>
+<text x="97" y="209" fill="#e6edf3" font-size="10.5" text-anchor="middle">Linux VM · NGINX</text>
+<rect x="468" y="150" width="150" height="92" rx="10" fill="#0e1626" stroke="#56d4dd"/>
+<text x="543" y="170" fill="#56d4dd" font-size="11" text-anchor="middle">Spoke 2 · Identity</text>
+<rect x="484" y="184" width="118" height="42" rx="7" fill="#10202f" stroke="#2a4a66"/>
+<text x="543" y="209" fill="#e6edf3" font-size="10.5" text-anchor="middle">Windows DC · AD/DNS</text>
+<line x1="172" y1="196" x2="198" y2="196" stroke="#56d4dd" stroke-dasharray="4 3"/>
+<line x1="442" y1="196" x2="468" y2="196" stroke="#56d4dd" stroke-dasharray="4 3"/>
+<text x="185" y="189" fill="#5d6772" font-size="9" text-anchor="middle">peer</text>
+<text x="455" y="189" fill="#5d6772" font-size="9" text-anchor="middle">peer</text>
+<line x1="264" y1="152" x2="264" y2="50" stroke="#58a6ff" marker-end="url(#ar)"/>
+<text x="276" y="92" fill="#58a6ff" font-size="10">all egress via firewall (UDR)</text>
+<text x="320" y="276" fill="#5d6772" font-size="10" text-anchor="middle">deny-by-default outbound; only named destinations allowed</text>
+</svg>`},
+"2.2":{cap:"Portal-style mock — NSG inbound rules. Explicit allows sit on top; the implicit DenyAllInbound at the bottom blocks everything else (least privilege).",
+svg:`<svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace">
+<rect x="0" y="0" width="640" height="200" fill="#0c0f14"/>
+<rect x="0" y="0" width="640" height="30" fill="#10202f"/>
+<text x="14" y="20" fill="#58a6ff" font-size="13">Inbound security rules — nsg-web</text>
+<text x="14" y="52" fill="#9aa6b4" font-size="11">Priority</text>
+<text x="86" y="52" fill="#9aa6b4" font-size="11">Name</text>
+<text x="300" y="52" fill="#9aa6b4" font-size="11">Port</text>
+<text x="360" y="52" fill="#9aa6b4" font-size="11">Proto</text>
+<text x="424" y="52" fill="#9aa6b4" font-size="11">Source</text>
+<text x="560" y="52" fill="#9aa6b4" font-size="11">Action</text>
+<line x1="14" y1="60" x2="626" y2="60" stroke="#20252c"/>
+<rect x="8" y="98" width="624" height="28" fill="#0f141b"/>
+<text x="14" y="84" fill="#d3e3f0" font-size="11">100</text>
+<text x="86" y="84" fill="#d3e3f0" font-size="11">Allow-HTTPS</text>
+<text x="300" y="84" fill="#d3e3f0" font-size="11">443</text>
+<text x="360" y="84" fill="#d3e3f0" font-size="11">TCP</text>
+<text x="424" y="84" fill="#d3e3f0" font-size="11">Internet</text>
+<rect x="556" y="73" width="58" height="17" rx="8" fill="#10202f" stroke="#56d4dd"/><text x="585" y="85" fill="#56d4dd" font-size="10" text-anchor="middle">Allow</text>
+<text x="14" y="116" fill="#d3e3f0" font-size="11">110</text>
+<text x="86" y="116" fill="#d3e3f0" font-size="11">Allow-SSH-Bastion</text>
+<text x="300" y="116" fill="#d3e3f0" font-size="11">22</text>
+<text x="360" y="116" fill="#d3e3f0" font-size="11">TCP</text>
+<text x="424" y="116" fill="#d3e3f0" font-size="11">BastionSubnet</text>
+<rect x="556" y="105" width="58" height="17" rx="8" fill="#10202f" stroke="#56d4dd"/><text x="585" y="117" fill="#56d4dd" font-size="10" text-anchor="middle">Allow</text>
+<text x="14" y="148" fill="#9aa6b4" font-size="11">4096</text>
+<text x="86" y="148" fill="#9aa6b4" font-size="11">DenyAllInbound</text>
+<text x="300" y="148" fill="#9aa6b4" font-size="11">Any</text>
+<text x="360" y="148" fill="#9aa6b4" font-size="11">Any</text>
+<text x="424" y="148" fill="#9aa6b4" font-size="11">Any</text>
+<rect x="556" y="137" width="58" height="17" rx="8" fill="#2a1416" stroke="#ff6b66"/><text x="585" y="149" fill="#ff6b66" font-size="10" text-anchor="middle">Deny</text>
+<text x="14" y="180" fill="#5d6772" font-size="10">lower priority number = evaluated first; the implicit deny is last</text>
+</svg>`}
+};
+
+function renderBody(m){
+  const body = el("div","mod-body");
+
+  const why = el("div","seg why");
+  why.appendChild(el("div","seg-lbl","Why it matters (plain English)"));
+  why.appendChild(el("p",null,m.why));
+  body.appendChild(why);
+
+  if(typeof VIZ!=="undefined" && VIZ[m.id]){
+    const v=VIZ[m.id];
+    const fig=el("div","viz");
+    const fr=el("div","viz-frame"); fr.innerHTML=v.svg;
+    fig.appendChild(fr);
+    if(v.cap) fig.appendChild(el("div","viz-cap",v.cap));
+    body.appendChild(fig);
+  }
+
+  const doSeg = el("div","seg");
+  doSeg.appendChild(el("div","seg-lbl","Do this"));
+  const ul = el("ul","steps");
+  m.steps.forEach(s=>{
+    if(s.code!=null){ const pre=el("pre"); pre.textContent=s.code; doSeg.appendChild(ul.children.length?ul:document.createComment("")); doSeg.appendChild(pre); }
+    else { const li=el("li",null,s.t); ul.appendChild(li); }
+  });
+  if(ul.children.length) doSeg.insertBefore(ul, doSeg.querySelector("pre"));
+  body.appendChild(doSeg);
+
+  if(m.rule){
+    const rs=el("div","seg rule");
+    rs.appendChild(el("div","seg-lbl","Rule of thumb — how pros work"));
+    rs.appendChild(el("p",null,m.rule));
+    body.appendChild(rs);
+  }
+
+  if(m.tshoot && m.tshoot.length){
+    const ts=el("div","seg");
+    ts.appendChild(el("div","seg-lbl","Troubleshoot"));
+    const tul=el("ul","steps tshoot");
+    m.tshoot.forEach(t=> tul.appendChild(el("li",null,t)));
+    ts.appendChild(tul); body.appendChild(ts);
+  }
+
+  const il=el("div","seg il6");
+  il.appendChild(el("div","seg-lbl",m.tieLabel || "IL6 / RMF tie-in"));
+  il.appendChild(el("p",null,m.il6));
+  body.appendChild(il);
+
+  return body;
+}
+
+function buildModule(m){
+  const mod = el("div","mod"); mod.dataset.id=m.id;
+  const top = el("div","mod-top");
+  const chk = el("div","chk");
+  const title = el("div","mod-title");
+  title.appendChild(el("div","mod-id","MODULE "+m.id));
+  title.appendChild(el("div","mod-name",m.name));
+  const chev = el("div","chev","▶");
+  top.append(chk,title,chev);
+
+  const body = renderBody(m);
+  mod.append(top,body);
+
+  // toggle open on title/chev; checkbox toggles done
+  top.addEventListener("click",(e)=>{
+    if(e.target===chk){ toggleDone(m.id); return; }
+    mod.classList.toggle("open");
+  });
+  chk.addEventListener("click",(e)=>{ e.stopPropagation(); toggleDone(m.id); });
+
+  if(done[m.id]) mod.classList.add("done");
+  return mod;
+}
+
+function buildPhases(){
+  const root = document.getElementById("phases");
+  root.innerHTML="";
+  PHASES.forEach((p)=>{
+    const sec=el("section","phase"); sec.dataset.tag=p.tag;
+    const head=el("div","phase-head");
+    head.appendChild(el("span","phase-tag",p.tag));
+    head.appendChild(el("h2",null,p.title));
+    const prog=el("div","phase-prog");
+    const pbar=el("div","pbar"); const fill=el("i"); pbar.appendChild(fill);
+    const ptxt=el("span","ptxt","0/"+p.mods.length); prog.append(ptxt,pbar);
+    head.appendChild(prog);
+    head.appendChild(el("div","ph-sub",p.sub));
+    sec.appendChild(head);
+    p.mods.forEach(m=> sec.appendChild(buildModule(m)));
+    root.appendChild(sec);
+  });
+}
+
+function toggleDone(id){
+  done[id] = !done[id];
+  if(!done[id]) delete done[id];
+  const mod=document.querySelector('.mod[data-id="'+id+'"]');
+  if(mod) mod.classList.toggle("done", !!done[id]);
+  updateMeters();
+  saveProgress();
+}
+
+function updateMeters(){
+  const total = totalMods;
+  const completed = Object.keys(done).filter(k=>done[k]).length;
+  const pct = total? Math.round(completed/total*100):0;
+  document.getElementById("pctNum").textContent=pct;
+  document.getElementById("overBar").style.width=pct+"%";
+  document.getElementById("modCount").textContent=completed+" / "+total+" modules";
+
+  // per-phase + ledger
+  const ledger=document.getElementById("ledger"); ledger.innerHTML="";
+  let phasesDone=0;
+  PHASES.forEach(p=>{
+    const c=p.mods.filter(m=>done[m.id]).length;
+    const ppct = Math.round(c/p.mods.length*100);
+    if(c===p.mods.length) phasesDone++;
+    const sec=document.querySelector('.phase[data-tag="'+p.tag+'"]');
+    if(sec){ sec.querySelector(".ptxt").textContent=c+"/"+p.mods.length; sec.querySelector(".pbar > i").style.width=ppct+"%"; }
+    const row=el("div","ledger-row");
+    row.appendChild(el("b",null,p.tag+" · "+p.title));
+    const v=el("span","v",c+"/"+p.mods.length); if(c<p.mods.length) v.style.color="var(--ink-faint)";
+    row.appendChild(v); ledger.appendChild(row);
+  });
+  document.getElementById("phaseCount").textContent=phasesDone+" / "+PHASES.length+" phases";
+}
+
+/* ----------------------------- CONTROLS ----------------------------- */
+function wireControls(){
+  document.getElementById("expandAll").onclick=()=>document.querySelectorAll(".mod").forEach(m=>m.classList.add("open"));
+  document.getElementById("collapseAll").onclick=()=>document.querySelectorAll(".mod").forEach(m=>m.classList.remove("open"));
+  document.getElementById("resetAll").onclick=async()=>{
+    if(!confirm("Reset all progress? This clears every checkmark.")) return;
+    done={}; mem={};
+    document.querySelectorAll(".mod").forEach(m=>m.classList.remove("done"));
+    updateMeters(); await saveProgress();
+  };
+}
+
+/* ----------------------------- PREREQUISITES + TABS ----------------------------- */
+const KEY_PRE = "isse-lab-prereqs-v1";
+let donePre = {};
+let activeTab = "prereq";
+
+async function loadPrereqs(){
+  if(hasStore){
+    try{ const r = await window.storage.get(KEY_PRE); if(r && r.value){ const o = JSON.parse(r.value); donePre = o.items || {}; activeTab = o.tab || "prereq"; } }
+    catch(e){ donePre = {}; }
+  }
+}
+async function savePrereqs(){
+  if(hasStore){ try{ await window.storage.set(KEY_PRE, JSON.stringify({items:donePre, tab:activeTab})); }catch(e){} }
+}
+
+const PREREQS = [
+  { id:"pre.1", title:"A workstation you control", body:"A Windows, Mac, or Linux machine where you can install software, with reliable internet. (At a real job this will be a managed, locked-down device — see the note above.)" },
+  { id:"pre.2", title:"Azure subscription + a budget alert", body:"If you do not have one yet, create an Azure free account (about $200 credit for 30 days) or a Pay-As-You-Go subscription billed to a card; check what you have with 'az account show'. Then, before building anything, set a Budget with alerts at $50 / $80 / $100 under Cost Management so the lab can never surprise you." },
+  { id:"pre.3", title:"Install VS Code — your workbench", body:"Download from code.visualstudio.com. This is where the heavy lifting happens: your files in the main pane, a terminal across the bottom." },
+  { id:"pre.4", title:"Install the CLIs (they run inside VS Code)", body:"Azure CLI (Command-Line Interface), Terraform, and Git are separate installs on your machine; VS Code's integrated terminal then runs them all in one window.", code:"winget install Microsoft.AzureCLI\nwinget install Hashicorp.Terraform\nwinget install Git.Git\n# mac:  brew install azure-cli terraform git" },
+  { id:"pre.4b", title:"How to READ a command — flags, dashes, and --", body:"Every command in this course follows one grammar: PROGRAM, then SUBCOMMAND (the verb), then FLAGS — named details that start with a dash. In 'az vm deallocate -g rg-lab -n vm-web': az = the program, vm deallocate = the verb, -g rg-lab = 'the Group is rg-lab', -n vm-web = 'the Name is vm-web'. Because flags are NAMED, their order never matters. One dash = short form (-g); two dashes = the same flag's long, readable form (--resource-group) — use long forms in scripts so future-you can read them. Short flags can stack: 'du -xh' is just '-x -h'. Some flags take a value (-t ed25519, --add-port=8080/tcp); others are on/off switches whose mere presence flips a behavior (--permanent, --force). A bare '--' with nothing attached means 'end of flags — everything after is plain data, even if it starts with a dash'. And the escape hatch every engineer uses constantly: add --help to ANY command to list its flags. Nobody memorizes flags; remembering the verb and looking up the flags is the actual professional skill.", code:"az vm deallocate -g rg-lab -n vm-web        # short flags\naz vm deallocate --resource-group rg-lab --name vm-web   # same command, long flags\naz vm deallocate --help                      # the escape hatch — works on everything" },
+  { id:"pre.5", title:"Add the VS Code extensions", body:"Extensions panel (the four squares) → install: HashiCorp Terraform, Azure CLI Tools, Remote - SSH (Secure Shell), YAML, and GitLens." },
+  { id:"pre.6", title:"Sign in and verify", body:"Restart VS Code so the terminal sees the new tools, then run:", code:"az login\naz account show -o table\nterraform -version\ngit --version" },
+  { id:"pre.7", title:"Create an SSH key", body:"Used to connect to and edit your Linux VMs (Virtual Machines) through Remote-SSH.", code:"ssh-keygen -t ed25519 -C \"isse-lab\"" },
+  { id:"pre.8", title:"Set up Git identity + GitHub", body:"Create a GitHub account, then set your git name and email. Use GitHub's private no-reply email — the 'ID+username@users.noreply.github.com' form — so your real address never lands in public commit history; the leading number is your unique GitHub user ID, and commits still attribute to your profile. Start the repo with the provided .gitignore so secrets never get committed.", code:"git config --global user.name \"cloudseamtech\"\ngit config --global user.email \"291063513+CloudSeamTech@users.noreply.github.com\"" },
+  { id:"pre.9", title:"Skim the glossary", body:"Open glossary.md once to get the acronyms (RMF (Risk Management Framework), STIG (Security Technical Implementation Guide), NSG (Network Security Group), PIM (Privileged Identity Management)…) and the why/cost of each Azure service in your head before you start." }
+];
+
+function buildPrereqs(){
+  const list = document.getElementById("prereq-list"); if(!list) return; list.innerHTML = "";
+  PREREQS.forEach(p=>{
+    const card = el("div","pcard"); card.dataset.pid = p.id;
+    const chk = el("div","chk");
+    const body = el("div","pc-body");
+    body.appendChild(el("div","pc-title",p.title));
+    body.appendChild(el("div","pc-desc",p.body));
+    if(p.code){ const pre = el("pre"); pre.textContent = p.code; body.appendChild(pre); }
+    card.append(chk, body);
+    if(donePre[p.id]) card.classList.add("done");
+    card.addEventListener("click",(e)=>{ if(e.target.closest("pre")) return; togglePrereq(p.id); });
+    list.appendChild(card);
+  });
+  updatePrereqMeter();
+}
+function togglePrereq(id){
+  donePre[id] = !donePre[id]; if(!donePre[id]) delete donePre[id];
+  const c = document.querySelector('.pcard[data-pid="'+id+'"]'); if(c) c.classList.toggle("done", !!donePre[id]);
+  updatePrereqMeter(); savePrereqs();
+  flash(document.getElementById("saveNote"), "\u2713 progress saved");
+}
+function updatePrereqMeter(){
+  const total = PREREQS.length;
+  const n = PREREQS.filter(p=>donePre[p.id]).length;
+  const pc = document.getElementById("preCount"); if(pc) pc.textContent = n+"/"+total;
+  const bar = document.getElementById("preBar"); if(bar) bar.style.width = Math.round(n/total*100)+"%";
+}
+function setTab(t){
+  activeTab = t;
+  const pv = document.getElementById("prereq-view"), cv = document.getElementById("phases");
+  if(pv) pv.classList.toggle("hidden", t!=="prereq");
+  if(cv) cv.classList.toggle("hidden", t!=="course");
+  const sg=document.getElementById("seq-guide"); if(sg) sg.classList.toggle("hidden", t!=="course");
+  const tp = document.getElementById("tab-prereq"), tc = document.getElementById("tab-course");
+  if(tp) tp.classList.toggle("active", t==="prereq");
+  if(tc) tc.classList.toggle("active", t==="course");
+  const ctr = document.querySelector(".controls"); if(ctr) ctr.style.display = (t==="course") ? "flex" : "none";
+  savePrereqs();
+}
+
+/* ----------------------------- INIT ----------------------------- */
+(async function init(){
+  await loadProgress();
+  await loadPrereqs();
+  buildPhases();
+  buildPrereqs();
+  updateMeters();
+  wireControls();
+  document.getElementById("tab-prereq").addEventListener("click",()=>setTab("prereq"));
+  document.getElementById("tab-course").addEventListener("click",()=>setTab("course"));
+  setTab(activeTab);
+})();
+</script>

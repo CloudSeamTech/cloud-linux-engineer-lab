@@ -1,0 +1,12 @@
+#cloud-config
+# Born-hardened on first boot, so every rebuild is identical (no hand-tuning).
+package_update: true
+packages:
+  - vim-enhanced
+  - git
+runcmd:
+  - [ bash, -c, "systemctl enable --now firewalld" ]
+  - [ bash, -c, "firewall-cmd --permanent --add-service=ssh && firewall-cmd --reload" ]
+  - [ bash, -c, "printf 'PermitRootLogin no\nPasswordAuthentication no\n' > /etc/ssh/sshd_config.d/99-hardening.conf && systemctl restart sshd" ]
+  # SELinux is already Enforcing by default on AlmaLinux/Rocky/RHEL — leave it that way.
+final_message: "Lab VM hardened and ready (uptime $UPTIME s)."
